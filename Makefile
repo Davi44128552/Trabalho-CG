@@ -1,6 +1,6 @@
 CXX = g++
 
-# Flags de compilação: C++11, Eigen3, SDL2 e multithreading (necessário para SDL2)
+# Flags de compilação: C++17, Eigen3, SDL2 e multithreading (necessário para SDL2)
 CXXFLAGS = -std=c++17 -I/usr/include/eigen3 -I/usr/include/SDL2 -D_REENTRANT
 
 # Flags de linkagem

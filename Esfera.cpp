@@ -41,7 +41,7 @@ double Esfera::obter_ti(const Raio& raio) const {
 }
 
 // Funcao para calcular a normal da esfera
-Eigen::Vector3d Esfera::obter_normal(Eigen::Vector3d pontoIntersecao){
+Eigen::Vector3d Esfera::obter_normal(const Eigen::Vector3d& pontoIntersecao) const {
 		// A normal da esfera e dada pela normalizacao de P - C
         Eigen::Vector3d normal = pontoIntersecao - this->centroEsfera;
         normal = (normal) / (normal.norm());

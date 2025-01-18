@@ -2,24 +2,22 @@
 #define ESFERA_H
 
 #include <Eigen/Dense>
-#include <cmath>
 #include "Raio.h"
+#include "Forma.h"
 
-class Esfera {
+class Esfera : public Forma {
+public:
+    // Construtor
+    Esfera(Eigen::Vector3d centroEsfera, double raioEsfera);
+    // Método para obter o ponto de interseção
+    double obter_ti(const Raio& raio) const override;
+    // Método para obter a normal da esfera
+    Eigen::Vector3d obter_normal(const Eigen::Vector3d& ponto) const override;
+
 private:
     // Atributos da esfera
     Eigen::Vector3d centroEsfera;
     double raioEsfera;
-
-public:
-    // Construtor
-    Esfera(Eigen::Vector3d centroEsfera, double raioEsfera);
-
-    // Metodo para calcular o ponto de intersecao
-    double obter_ti(const Raio& raio) const;
-
-    // Metodo para obter a normal da esfera
-    Eigen::Vector3d obter_normal(Eigen::Vector3d pontoIntersecao);
 };
 
 #endif // ESFERA_H
