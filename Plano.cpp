@@ -7,7 +7,7 @@ Plano::Plano(Eigen::Vector3d ponto_plano, Eigen::Vector3d normal){
 }
 
 // Implementando a funcao que verifica se o raio intercepta o plano
-Plano::obter_ti(const Raio& raio){
+double Plano::obter_ti(const Raio& raio) const {
 
 	/* Quando realizamos a deducao da verificacao de interceptacao
 	entre o raio e o plano, chegamos a seguinte formula: 
@@ -31,6 +31,6 @@ Plano::obter_ti(const Raio& raio){
 
 // Implementando a funcao para obter a normal
 // Neste caso, so temos que fazer um simples getter
-Plano::obter_normal(){
+Eigen::Vector3d Plano::obter_normal(){
 	return normal;
 }

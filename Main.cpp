@@ -4,6 +4,7 @@
 #include "Raio.h"
 #include "Esfera.h"
 #include "Iluminacao.h"
+#include <algorithm>
 
 using namespace std;
 
