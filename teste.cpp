@@ -8,7 +8,7 @@
 #include "Plano.h"
 using namespace std;
 
-int main() {
+int ddmain() {
     // Inicializando o SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         cerr << "Falha ao iniciar SDL: " << SDL_GetError() << endl;
@@ -47,7 +47,7 @@ int main() {
     double delta_y = height / nLinhas;
 
     // Definindo a posicao da fonte luminosa
-    Eigen::Vector3d posicao_luz(0, 25, 0);
+    Eigen::Vector3d posicao_luz(0, 5, 0);
     Iluminacao iluminacao(
         Eigen::Vector3d(0.5, 0.5, 0.5), Eigen::Vector3d(0.4, 0.4, 0.4),
         Eigen::Vector3d(0.7, 0.7, 0.7), Eigen::Vector3d(0.6, 0.6, 0.6),
@@ -80,47 +80,44 @@ int main() {
             double ponto_plano = plano.obter_ti(raio);
 
             if (!isnan(ponto_esfera) || !isnan(ponto_plano)) {
-                // Caso haja, definimos o ponto de intersecao
                 Eigen::Vector3d ponto_intersecao;
                 Eigen::Vector3d normal;
                 Eigen::Vector3d cor;
 
-                // Calculando os vetores necessarios para analisar a iluminacao total do objeto
-                Eigen::Vector3d visao = -dr;
                 if (!isnan(ponto_esfera) && (isnan(ponto_plano) || ponto_esfera < ponto_plano)) {
                     ponto_intersecao = Eigen::Vector3d(x * ponto_esfera, y * ponto_esfera, z * ponto_esfera);
                     normal = esfera.obter_normal(ponto_intersecao).normalized();
                     cor = Eigen::Vector3d(255, 80, 80);
-                }
-                else{
+                } else {
                     ponto_intersecao = Eigen::Vector3d(x * ponto_plano, y * ponto_plano, z * ponto_plano);
                     normal = plano.obter_normal(ponto_intersecao).normalized();
                     cor = Eigen::Vector3d(80, 80, 255);
-                    
                 }
-                Eigen::Vector3d luz = (posicao_luz - ponto_intersecao).normalized();
-                Raio raio_sombra(ponto_intersecao, luz);
-                double ponto_sombra_esfera = esfera.obter_ti(raio_sombra);
-                double ponto_sombra_plano = plano.obter_ti(raio_sombra);
 
-                if (!isnan(ponto_sombra_esfera) && ponto_sombra_esfera < (posicao_luz - ponto_intersecao).norm()) {
-                    // Caso haja sombra, pintamos de preto
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                    SDL_RenderDrawPoint(renderer, colunas, linhas);
-                } else if (!isnan(ponto_sombra_plano) && ponto_sombra_plano < (posicao_luz - ponto_intersecao).norm()) {
-                    // Caso haja sombra, pintamos de preto
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-                    SDL_RenderDrawPoint(renderer, colunas, linhas);
-                
+                // Calculando os vetores necessarios para analisar a iluminacao total do objeto
+                Eigen::Vector3d visao = -dr;
+                Eigen::Vector3d luz = (posicao_luz - ponto_intersecao).normalized();
+
+                // Verificando se há sombra
+                Raio raio_sombra(ponto_intersecao, luz);
+                double sombra_esfera = esfera.obter_ti(raio_sombra);
+                double sombra_plano = plano.obter_ti(raio_sombra);
+
+                if (!isnan(sombra_esfera) || !isnan(sombra_plano)) {
+                    cor *= 0.2; // Aplicando sombra
                 } else {
                     Eigen::Vector3d iluminacao_total = iluminacao.calcular_iluminacao_Total(luz, normal, visao).cwiseProduct(cor);
-                    Uint8 r = static_cast<Uint8>(std::clamp(iluminacao_total[0], 0.0, 255.0));
-                    Uint8 g = static_cast<Uint8>(std::clamp(iluminacao_total[1], 0.0, 255.0));
-                    Uint8 b = static_cast<Uint8>(std::clamp(iluminacao_total[2], 0.0, 255.0));
-
-                    SDL_SetRenderDrawColor(renderer, r, g, b, 255);
-                    SDL_RenderDrawPoint(renderer, colunas, linhas);
+                    cor = iluminacao_total;
                 }
+
+                // Convertendo os valores totais da aplicacao da iluminacao ao espectro rgb
+                Uint8 r = static_cast<Uint8>(std::clamp(cor[0], 0.0, 255.0));
+                Uint8 g = static_cast<Uint8>(std::clamp(cor[1], 0.0, 255.0));
+                Uint8 b = static_cast<Uint8>(std::clamp(cor[2], 0.0, 255.0));
+
+                // Pintando o objeto com a sua cor definida pela iluminacao
+                SDL_SetRenderDrawColor(renderer, r, g, b, 255);
+                SDL_RenderDrawPoint(renderer, colunas, linhas);
             }
         }
     }

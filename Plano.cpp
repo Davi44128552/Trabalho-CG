@@ -1,4 +1,4 @@
-# include "Plano.h"
+#include "Plano.h"
 
 // Implementando o construtor
 Plano::Plano(Eigen::Vector3d ponto_plano, Eigen::Vector3d normal){
@@ -31,6 +31,6 @@ double Plano::obter_ti(const Raio& raio) const {
 
 // Implementando a funcao para obter a normal
 // Neste caso, so temos que fazer um simples getter
-Eigen::Vector3d Plano::obter_normal(){
+Eigen::Vector3d Plano::obter_normal(const Eigen::Vector3d& ponto) const {
 	return normal;
 }

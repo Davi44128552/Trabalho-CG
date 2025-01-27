@@ -1,10 +1,11 @@
-# ifndef PLANO_H
-# define PLANO_H
+#ifndef PLANO_H
+#define PLANO_H
 
-# include <Eigen/Dense>
-# include "Raio.h"
+#include <Eigen/Dense>
+#include "Raio.h"
+#include "Forma.h"
 
-class Plano {
+class Plano : public Forma {
 
 private:
 	// Atributos
@@ -17,10 +18,10 @@ public:
 	Plano(Eigen::Vector3d ponto_plano, Eigen::Vector3d normal);
 
 	// Metodo para verificar se ocorre intersecao entre o raio e o plano
-	double obter_ti(const Raio& raio) const;
+	double obter_ti(const Raio& raio) const override;
 
 	// Metodo para obter a normal
-	Eigen::Vector3d obter_normal();
+	Eigen::Vector3d obter_normal(const Eigen::Vector3d& ponto) const override;
 
 };
 
