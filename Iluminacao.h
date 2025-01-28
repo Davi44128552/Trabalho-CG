@@ -46,6 +46,9 @@ class Iluminacao{
 		// Funcao para calcular a iluminacao total
 		Eigen::Vector3d calcular_iluminacao_Total(const Eigen::Vector3d& luz, const Eigen::Vector3d& normal, const Eigen::Vector3d& visao);
 
+		// Funcao para retornar a iluminacao ambiente
+		Eigen::Vector3d retornar_iluminacao_Ambiente();
+
 };
 
 # endif

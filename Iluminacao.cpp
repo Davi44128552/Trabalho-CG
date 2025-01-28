@@ -42,3 +42,7 @@ Eigen::Vector3d Iluminacao::calcular_iluminacao_Total(const Eigen::Vector3d& luz
     iluminacao_Total = iluminacao_Total.cwiseMax(0).cwiseMin(1);
     return iluminacao_Total;
 }
+
+Eigen::Vector3d Iluminacao::retornar_iluminacao_Ambiente() {
+    return k_Ambiente.cwiseProduct(intensidade_Ambiente);
+}
