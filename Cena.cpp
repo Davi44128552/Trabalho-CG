@@ -4,9 +4,12 @@
 Cena::Cena(const Eigen::Vector3d& posicao_luz, const Iluminacao& iluminacao) 
     : posicao_luz(posicao_luz), iluminacao(iluminacao) {
 
-    // Inicializando a cena com a esfera e o plano
-    objetos.push_back(new Esfera(Eigen::Vector3d(0.0, 0.0, -3.4), 0.4)); // Esfera
-    objetos.push_back(new Plano(Eigen::Vector3d(0.0, -0.5, 0.0), Eigen::Vector3d(0.0, 1.0, 0.0))); // Plano
+    // Inicializando a cena 
+    objetos.push_back(new Esfera(Eigen::Vector3d(1.0, 0.0, -3.4), 0.4)); 
+    //objetos.push_back(new Esfera(Eigen::Vector3d(0.0, 0.0, -3.4), 0.4));
+    objetos.push_back(new Plano(Eigen::Vector3d(0.0, -0.5, 0.0), Eigen::Vector3d(0.0, 1.0, 0.0))); 
+    //objetos.push_back(new Plano(Eigen::Vector3d(0.0, 1, 0.0), Eigen::Vector3d(0.0, -1.0, 0.0)));
+    objetos.push_back(new Cilindro(1.0, 0.2, Eigen::Vector3d(0.0, 1.0, 0.0), Eigen::Vector3d(2.0, -0.5, -3.4))); // Adicionado
 }
 
 void Cena::renderizar(SDL_Renderer* renderer, int nColunas, int nLinhas, const Eigen::Vector3d& posicao_observador, 
@@ -56,6 +59,8 @@ void Cena::calcularIluminacao(Raio& raio, SDL_Renderer* renderer, int colunas, i
             cor = Eigen::Vector3d(255, 80, 80);  // Cor da esfera
         } else if (dynamic_cast<Plano*>(forma_interseccionada)) {
             cor = Eigen::Vector3d(80, 80, 255);  // Cor do plano
+        } else if (dynamic_cast<Cilindro*>(forma_interseccionada)) {
+            cor = Eigen::Vector3d(80, 255, 80);  // Cor do cilindro
         }
 
         // Vetor de visão

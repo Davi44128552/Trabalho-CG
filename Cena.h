@@ -7,6 +7,7 @@
 #include "Esfera.h"
 #include "Plano.h"
 #include "Iluminacao.h"
+#include "Cilindro.h"
 #include "Forma.h"
 #include <iostream>
 #include <SDL2/SDL.h>

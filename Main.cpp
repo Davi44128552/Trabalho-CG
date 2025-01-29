@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "Plano.h"
 #include "Cena.h"
+#include "Cilindro.h" 
 using namespace std;
 
 int main() {
