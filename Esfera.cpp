@@ -21,23 +21,21 @@ double Esfera::obter_ti(const Raio& raio) const {
     double discriminante = (b * b) - (4 * a * c);
     double ti;
 
-    if (discriminante > 0) {
-        // Pegando o menor ti válido
-        ti = (-b - sqrt(discriminante)) / (2 * a);
-        if (ti >= 0) {
-            return ti;
-        }
-
-        ti = (-b + sqrt(discriminante)) / (2 * a);
-        return ti;
+    if (discriminante < 0) {
+	 return nan("");
     }
+// Pegando o menor ti válido
+   ti = (-b - sqrt(discriminante)) / (2 * a);
+   if (ti >= 0) {
+	 return ti;
+   }
 
-    if (discriminante == 0) {
-        ti = (-b) / (2 * a);
-        return ti;
-    }
+   ti = (-b + sqrt(discriminante)) / (2 * a);
+   if (ti >= 0){
+	   return ti;
+   }
+   return nan("");
 
-    return nan(""); // Caso não haja interseção, retorna NaN
 }
 
 // Funcao para calcular a normal da esfera
