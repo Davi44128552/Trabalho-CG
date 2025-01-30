@@ -15,13 +15,14 @@ double Plano::obter_ti(const Raio& raio) const {
 	Eigen::Vector3d v = raio.Po - ponto_plano;
 
 	// Verificando se ha intersecao
-	if (raio.dr.dot(normal) != 0){ // Verificando, inicialmente, se o denominador nao e zero
-		double ti = -((v.dot(normal)) / (raio.dr.dot(normal)));
+	if (raio.dr.dot(normal) == 0){ // Verificando, inicialmente, se o denominador e zero
+		return nan("");
+	}
+	double ti = -((v.dot(normal)) / (raio.dr.dot(normal)));
 
-		// Verificando se ti e negativo
-		if (ti >= 0){
-			return ti;
-		}
+	// Verificando se ti e negativo
+	if (ti >= 0){
+		return ti;
 	}
 
 	// Caso o ponto nao seja valido, entao retornamos nulo
