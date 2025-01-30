@@ -9,14 +9,6 @@
 // Classe do cilindro
 class Cilindro : public Forma {
 
-private:
-	// Atributos do cilindro
-	double altura; // Altura do cilindro
-	double raio_base; // Tamanho do raio da base
-	Eigen::Vector3d dc; // Vetor unitario que indica a direcao do cilindro
-	Eigen::Vector3d centro_base; // Posicao no espaco em que se encontra o centro da base da esfera
-	char posicao; // Valor que vai definir se estamos no topo, base ou no meio do cilindro
-
 public:
 	// Construtor do objeto
 	Cilindro(double altura, double raio_base, Eigen::Vector3d dc, Eigen::Vector3d centro_base);
@@ -25,8 +17,15 @@ public:
 	double obter_ti(const Raio& raio) const override;
 
 	// Metodo para obter a normal do cilindro
-	Eigen::Vector3d obter_normal(Eigen::Vector3d pontoIntersecao) const override;
+	Eigen::Vector3d obter_normal(const Eigen::Vector3d& ponto) const override;
+
+private:
+	// Atributos do cilindro
+	double altura; // Altura do cilindro
+	double raio_base; // Tamanho do raio da base
+	Eigen::Vector3d dc; // Vetor unitario que indica a direcao do cilindro
+	Eigen::Vector3d centro_base; // Posicao no espaco em que se encontra o centro da base da esfera
+	mutable char posicao; // Valor que vai definir se estamos no topo, base ou no meio do cilindro
 
 };
-
 # endif

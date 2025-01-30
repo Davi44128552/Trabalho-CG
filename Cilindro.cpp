@@ -1,7 +1,7 @@
 # include "Cilindro.h"
 
 // Implementando o construtor do cilindro
-Cilindro::Cilindro(double altura, double raio_base, Eigen::Vector3d dc, Eigen::Vector3d centro_base)const{
+Cilindro::Cilindro(double altura, double raio_base, Eigen::Vector3d dc, Eigen::Vector3d centro_base){
 
 	this->altura = altura;
 	this->raio_base = raio_base;
@@ -12,7 +12,7 @@ Cilindro::Cilindro(double altura, double raio_base, Eigen::Vector3d dc, Eigen::V
 }
 
 // Implementando a funcao para verificar se existe intersecao entre o raio e o cilindro
-double Cilindro::obter_ti(const Raio& raio){
+double Cilindro::obter_ti(const Raio& raio)const{
 
 	/* Quando calculamos a deducao do cilindro, chegamos a
 	i*i + 2*j*i + j*j, onde 
@@ -82,7 +82,7 @@ double Cilindro::obter_ti(const Raio& raio){
 }
 
 // Implementando uma funcao para obter a normal do objeto
-Eigen::Vector3d Cilindro::obter_normal(Eigen::Vector3d pontoIntersecao) const{
+Eigen::Vector3d Cilindro::obter_normal(const Eigen::Vector3d& pontoIntersecao) const{
 
 	// Caso estejamos no topo do cilindro, a nossa normal vai ser o dc
 	if (posicao == 't'){

@@ -49,7 +49,7 @@ int main() {
     double delta_y = height / nLinhas;
 
     // Definindo a posicao da fonte luminosa
-    Eigen::Vector3d posicao_luz(0, 5, 0);
+    Eigen::Vector3d posicao_luz(0, 3, 0);
     Iluminacao iluminacao(
         Eigen::Vector3d(0.5, 0.5, 0.5), Eigen::Vector3d(0.4, 0.4, 0.4),
         Eigen::Vector3d(0.7, 0.7, 0.7), Eigen::Vector3d(0.6, 0.6, 0.6),

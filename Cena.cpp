@@ -9,7 +9,7 @@ Cena::Cena(const Eigen::Vector3d& posicao_luz, const Iluminacao& iluminacao)
     //objetos.push_back(new Esfera(Eigen::Vector3d(0.0, 0.0, -3.4), 0.4));
     objetos.push_back(new Plano(Eigen::Vector3d(0.0, -0.5, 0.0), Eigen::Vector3d(0.0, 1.0, 0.0))); 
     //objetos.push_back(new Plano(Eigen::Vector3d(0.0, 1, 0.0), Eigen::Vector3d(0.0, -1.0, 0.0)));
-    objetos.push_back(new Cilindro(1.0, 0.2, Eigen::Vector3d(0.0, 1.0, 0.0), Eigen::Vector3d(2.0, -0.5, -3.4))); // Adicionado
+    objetos.push_back(new Cilindro(1, 1, Eigen::Vector3d(0.0, 1.0, 0.0), Eigen::Vector3d(0.0, 0.5, -4.4))); // Adicionado
 }
 
 void Cena::renderizar(SDL_Renderer* renderer, int nColunas, int nLinhas, const Eigen::Vector3d& posicao_observador, 
