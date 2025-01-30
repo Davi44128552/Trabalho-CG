@@ -51,29 +51,32 @@ double Cilindro::obter_ti(const Raio& raio)const{
 	// Verificando se os valores sao validos
 	for (double t: {t1, t2}){
 
-		if (t > 0){
-
-			// Verificando se 0 <= (P-centro_base)*dc <= H
-			Eigen::Vector3d ponto_intersecao = raio.Po + t*raio.dr;
-			if (0 <= (ponto_intersecao - centro_base).dot(dc) && (ponto_intersecao - centro_base).dot(dc) <= altura){
-
-				// Definindo em que parte estamos do cilindro, caso estejamos no cilindro
-				if ((ponto_intersecao - centro_base).dot(dc) == 0){ // Neste caso, estaremos na base do cilindro
-					posicao = 'b'; // base
-				}
-
-				else if ((ponto_intersecao - centro_base).dot(dc) == altura){ // Neste caso, estaremos no topo do cilindro
-					posicao = 't'; // topo
-				}
-
-				else{ // Por fim, neste caso, estaremos no meio do cilindro, se estivermos no cilindro
-					posicao = 'm'; // meio
-				}
-
-				return t;
-			}
-
+		if (t < 0){
+			continue;
 		}
+		
+
+		// Verificando se 0 <= (P-centro_base)*dc <= H
+		Eigen::Vector3d ponto_intersecao = raio.Po + t*raio.dr;
+		if (0 > (ponto_intersecao - centro_base).dot(dc) && (ponto_intersecao - centro_base).dot(dc) > altura){
+			return nan("");
+		}
+
+		// Definindo em que parte estamos do cilindro, caso estejamos no cilindro
+		if ((ponto_intersecao - centro_base).dot(dc) == 0){ // Neste caso, estaremos na base do cilindro
+			posicao = 'b'; // base
+		}
+
+		else if ((ponto_intersecao - centro_base).dot(dc) == altura){ // Neste caso, estaremos no topo do cilindro
+			posicao = 't'; // topo
+		}
+
+		else{ // Por fim, neste caso, estaremos no meio do cilindro, se estivermos no cilindro
+			posicao = 'm'; // meio
+		}
+
+		return t;
+
 
 	}
 
