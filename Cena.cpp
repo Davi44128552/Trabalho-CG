@@ -43,15 +43,15 @@ void Cena::calcularIluminacao(Raio& raio, SDL_Renderer* renderer, int colunas, i
     // Verificando interseção com os objetos da cena (esfera, plano, etc.)
     for (auto& objeto : objetos) {
         double ponto = objeto->obter_ti(raio);
-        if (!isnan(ponto) && ponto < ponto_mais_proximo) {
+        if (ponto>0 && ponto < ponto_mais_proximo) {
             ponto_mais_proximo = ponto;
             forma_interseccionada = objeto;
         }
     }
 
-    if (forma_interseccionada != nullptr) {
+    if(!forma_interseccionada) return;
+
         Eigen::Vector3d ponto_intersecao = raio.obter_origem() + raio.obter_direcao() * ponto_mais_proximo;
-        Eigen::Vector3d normal = forma_interseccionada->obter_normal(ponto_intersecao).normalized();
         Eigen::Vector3d cor;
 
         // Definindo a cor do objeto (exemplo simples)
@@ -63,28 +63,23 @@ void Cena::calcularIluminacao(Raio& raio, SDL_Renderer* renderer, int colunas, i
             cor = Eigen::Vector3d(80, 255, 80);  // Cor do cilindro
         }
 
-        // Vetor de visão
-        Eigen::Vector3d visao = -raio.obter_direcao();
+
 
         // Calculando a iluminação do ponto de interseção
         Eigen::Vector3d luz = (posicao_luz - ponto_intersecao).normalized();
-        Raio raio_sombra(ponto_intersecao + luz * 1e-4, luz); // Raio para verificar sombra
+    bool em_sombra = false;
 
-        double ponto_sombra = std::numeric_limits<double>::infinity();
-        for (auto& objeto : objetos) {
-            double ponto = objeto->obter_ti(raio_sombra);
-            if (!isnan(ponto) && ponto > 0 && ponto < (posicao_luz - ponto_intersecao).norm()) {
-                ponto_sombra = ponto;
-                break;
-            }
+    for (auto& objeto : objetos) {
+        if (objeto == forma_interseccionada) continue;
+        if (objeto->obter_ti(Raio(ponto_intersecao + luz * 1e-4, luz)) > 0) {
+            em_sombra = true;
+            break;
         }
+    }
 
-        Eigen::Vector3d iluminacao_total;
-        if (ponto_sombra == std::numeric_limits<double>::infinity()) {
-            iluminacao_total = iluminacao.calcular_iluminacao_Total(luz, normal, visao);
-        } else {
-            iluminacao_total = iluminacao.retornar_iluminacao_Ambiente();
-        }
+        Eigen::Vector3d normal = forma_interseccionada->obter_normal(ponto_intersecao).normalized();
+    Eigen::Vector3d iluminacao_total = em_sombra ? iluminacao.retornar_iluminacao_Ambiente() 
+                                                 : iluminacao.calcular_iluminacao_Total(luz, normal, -raio.obter_direcao());
 
         // Aplicando a cor com base na iluminação
         iluminacao_total = iluminacao_total.cwiseProduct(cor);
@@ -94,5 +89,5 @@ void Cena::calcularIluminacao(Raio& raio, SDL_Renderer* renderer, int colunas, i
 
         SDL_SetRenderDrawColor(renderer, r, g, b, 255);
         SDL_RenderDrawPoint(renderer, colunas, linhas);
-    }
+    
 }

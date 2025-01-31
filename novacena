@@ -1,0 +1,67 @@
+#include "Cena.h"
+
+Cena::Cena(const Eigen::Vector3d& posicao_luz, const Iluminacao& iluminacao) 
+    : posicao_luz(posicao_luz), iluminacao(iluminacao) {
+    objetos.push_back(new Esfera(Eigen::Vector3d(1.0, 0.0, -3.4), 0.4)); 
+    objetos.push_back(new Plano(Eigen::Vector3d(0.0, -0.5, 0.0), Eigen::Vector3d(0.0, 1.0, 0.0))); 
+    objetos.push_back(new Cilindro(1, 1, Eigen::Vector3d(0.0, 1.0, 0.0), Eigen::Vector3d(0.0, 0.5, -4.4))); 
+}
+
+void Cena::renderizar(SDL_Renderer* renderer, int nColunas, int nLinhas, const Eigen::Vector3d& posicao_observador, 
+                      const Eigen::Vector3d& ponto_superior_esquerdo, double delta_x, double delta_y, double z) {
+    for (int linhas = 0; linhas < nLinhas; linhas++) {
+        double y = ponto_superior_esquerdo[1] - delta_y * (linhas + 0.5);
+        for (int colunas = 0; colunas < nColunas; colunas++) {
+            double x = ponto_superior_esquerdo[0] + delta_x * (colunas + 0.5);
+            
+            Raio raio(posicao_observador, Eigen::Vector3d(x, y, -z));
+            calcularIluminacao(raio, renderer, colunas, linhas);
+        }
+    }
+    SDL_RenderPresent(renderer);
+}
+
+void Cena::calcularIluminacao(Raio& raio, SDL_Renderer* renderer, int colunas, int linhas) {
+    double ponto_mais_proximo = std::numeric_limits<double>::infinity();
+    Forma* forma_interseccionada = nullptr;
+
+    for (auto& objeto : objetos) {
+        double ponto = objeto->obter_ti(raio);
+        if (ponto > 0 && ponto < ponto_mais_proximo) {
+            ponto_mais_proximo = ponto;
+            forma_interseccionada = objeto;
+        }
+    }
+
+    if (!forma_interseccionada) return; // Sem interseção, mantém a cor de fundo
+
+    Eigen::Vector3d ponto_intersecao = raio.obter_origem() + raio.obter_direcao() * ponto_mais_proximo;
+    Eigen::Vector3d normal = forma_interseccionada->obter_normal(ponto_intersecao).normalized();
+    Eigen::Vector3d cor = (dynamic_cast<Esfera*>(forma_interseccionada)) ? Eigen::Vector3d(255, 80, 80) :
+                         (dynamic_cast<Plano*>(forma_interseccionada)) ? Eigen::Vector3d(80, 80, 255) :
+                         (dynamic_cast<Cilindro*>(forma_interseccionada)) ? Eigen::Vector3d(80, 255, 80) :
+                         Eigen::Vector3d(255, 255, 255); 
+
+    Eigen::Vector3d luz = (posicao_luz - ponto_intersecao).normalized();
+    bool em_sombra = false;
+
+    for (auto& objeto : objetos) {
+        if (objeto == forma_interseccionada) continue;
+        if (objeto->obter_ti(Raio(ponto_intersecao + luz * 1e-4, luz)) > 0) {
+            em_sombra = true;
+            break;
+        }
+    }
+
+    Eigen::Vector3d iluminacao_total = em_sombra ? iluminacao.retornar_iluminacao_Ambiente() 
+                                                 : iluminacao.calcular_iluminacao_Total(luz, normal, -raio.obter_direcao());
+
+    iluminacao_total = iluminacao_total.cwiseProduct(cor);
+    SDL_SetRenderDrawColor(renderer, 
+        static_cast<Uint8>(std::clamp(iluminacao_total[0], 0.0, 255.0)), 
+        static_cast<Uint8>(std::clamp(iluminacao_total[1], 0.0, 255.0)), 
+        static_cast<Uint8>(std::clamp(iluminacao_total[2], 0.0, 255.0)), 
+        255);
+    
+    SDL_RenderDrawPoint(renderer, colunas, linhas);
+}

@@ -11,17 +11,14 @@
 using namespace std;
 
 int main() {
-    // Inicializando o SDL
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
         cerr << "Falha ao iniciar SDL: " << SDL_GetError() << endl;
         return -1;
     }
 
-    // Dimensões da tela
-    int nColunas = 1000;
-    int nLinhas = 1000;
+    int nColunas = 400;
+    int nLinhas = 400;
 
-    // Criando a janela
     SDL_Window* window = SDL_CreateWindow("Canvas", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, nColunas, nLinhas, SDL_WINDOW_SHOWN);
     if (!window) {
         cerr << "Falha ao criar a janela: " << SDL_GetError() << endl;
@@ -29,7 +26,6 @@ int main() {
         return -1;
     }
 
-    // Criando o renderizador
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (!renderer) {
         cerr << "Falha ao criar o renderizador: " << SDL_GetError() << endl;
@@ -38,7 +34,6 @@ int main() {
         return -1;
     }
 
-    // Variáveis da tela/canvas
     double height = 2;
     double width = 2;
     double dJanela = 3;
@@ -48,28 +43,41 @@ int main() {
     double delta_x = width / nColunas;
     double delta_y = height / nLinhas;
 
-    // Definindo a posicao da fonte luminosa
     Eigen::Vector3d posicao_luz(0, 3, 0);
     Iluminacao iluminacao(
         Eigen::Vector3d(0.5, 0.5, 0.5), Eigen::Vector3d(0.4, 0.4, 0.4),
         Eigen::Vector3d(0.7, 0.7, 0.7), Eigen::Vector3d(0.6, 0.6, 0.6),
         Eigen::Vector3d(0.7, 0.7, 0.7), Eigen::Vector3d(0.2, 0.2, 0.2), 1.5);
 
-     Cena cena(posicao_luz, iluminacao);
-    
+    Cena cena(posicao_luz, iluminacao);
 
-    // Renderizar a cena
-    cena.renderizar(renderer, nColunas, nLinhas, posicao_observador, ponto_superior_esquerdo, delta_x, delta_y, dJanela);
-
-    // Loop da janela
     bool running = true;
     SDL_Event event;
+
+    double velocidade = 0.1;  // Velocidade do movimento da câmera
+
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = false;
+            } else if (event.type == SDL_KEYDOWN) {
+                switch (event.key.keysym.sym) {
+                    case SDLK_w: posicao_observador[2] -= velocidade; break; // Frente
+                    case SDLK_s: posicao_observador[2] += velocidade; break; // Trás
+                    case SDLK_a: posicao_observador[0] -= velocidade; break; // Esquerda
+                    case SDLK_d: posicao_observador[0] += velocidade; break; // Direita
+                    case SDLK_q: posicao_observador[1] += velocidade; break; // Cima
+                    case SDLK_e: posicao_observador[1] -= velocidade; break; // Baixo
+                }
             }
         }
+
+        // Limpa a tela antes de re-renderizar
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        // Renderiza a cena com a nova posição do observador
+        cena.renderizar(renderer, nColunas, nLinhas, posicao_observador, ponto_superior_esquerdo, delta_x, delta_y, dJanela);
     }
 
     SDL_DestroyRenderer(renderer);
