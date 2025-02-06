@@ -5,17 +5,15 @@
 #include <vector>
 #include "Raio.h"
 #include "Esfera.h"
-#include "Plano.h"
-#include "Iluminacao.h"
-#include "Cilindro.h"
 #include "Forma.h"
 #include <iostream>
 #include <SDL2/SDL.h>
+#include "Material.h"
 
 class Cena {
 public:
     // Construtor
-    Cena(const Eigen::Vector3d& posicao_luz, const Iluminacao& iluminacao);
+    Cena(const Eigen::Vector3d& posicao_luz);
     
     // Método para calcular e renderizar a cena
     void renderizar(SDL_Renderer* renderer, int nColunas, int nLinhas, const Eigen::Vector3d& posicao_observador, 
@@ -24,7 +22,6 @@ public:
     // Métodos auxiliares para lidar com colisões e iluminação
 private:
     Eigen::Vector3d posicao_luz;
-    Iluminacao iluminacao;
     std::vector<Forma*> objetos; // Lista de formas da cena
 
     // Verifica a interseção e calcula a iluminação

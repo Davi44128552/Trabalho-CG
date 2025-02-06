@@ -3,11 +3,9 @@
 #include <SDL2/SDL.h>
 #include "Raio.h"
 #include "Esfera.h"
-#include "Iluminacao.h"
 #include <algorithm>
-#include "Plano.h"
 #include "Cena.h"
-#include "Cilindro.h" 
+#include "Material.h"
 using namespace std;
 
 int main() {
@@ -16,8 +14,8 @@ int main() {
         return -1;
     }
 
-    int nColunas = 400;
-    int nLinhas = 400;
+    int nColunas = 1000;
+    int nLinhas = 1000;
 
     SDL_Window* window = SDL_CreateWindow("Canvas", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, nColunas, nLinhas, SDL_WINDOW_SHOWN);
     if (!window) {
@@ -44,12 +42,8 @@ int main() {
     double delta_y = height / nLinhas;
 
     Eigen::Vector3d posicao_luz(0, 3, 0);
-    Iluminacao iluminacao(
-        Eigen::Vector3d(0.5, 0.5, 0.5), Eigen::Vector3d(0.4, 0.4, 0.4),
-        Eigen::Vector3d(0.7, 0.7, 0.7), Eigen::Vector3d(0.6, 0.6, 0.6),
-        Eigen::Vector3d(0.7, 0.7, 0.7), Eigen::Vector3d(0.2, 0.2, 0.2), 1.5);
 
-    Cena cena(posicao_luz, iluminacao);
+    Cena cena(posicao_luz);
 
     bool running = true;
     SDL_Event event;
