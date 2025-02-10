@@ -1,8 +1,8 @@
 #include "Esfera.h"
 
 // Construtor
-Esfera::Esfera(Eigen::Vector3d centroEsfera, double raioEsfera, const Material& material, const Eigen::Vector3d& cor)
-    : Forma(cor, material), centroEsfera(centroEsfera), raioEsfera(raioEsfera) {}
+Esfera::Esfera(Eigen::Vector3d centroEsfera, double raioEsfera, const Material& material)
+    : Forma(material), centroEsfera(centroEsfera), raioEsfera(raioEsfera) {}
 
 // Método para calcular o ponto de interseção
 double Esfera::obter_ti(const Raio& raio) const {

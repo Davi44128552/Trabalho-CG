@@ -1,31 +1,32 @@
 #ifndef CENA_H
 #define CENA_H
 
-#include <Eigen/Dense>
 #include <vector>
-#include "Raio.h"
-#include "Esfera.h"
+#include <tuple>
+#include <Eigen/Dense>
 #include "Forma.h"
-#include <iostream>
-#include <SDL2/SDL.h>
-#include "Material.h"
+#include "Luz.h"
+#include "Raio.h"
 
 class Cena {
 public:
-    // Construtor
-    Cena(const Eigen::Vector3d& posicao_luz);
-    
-    // Método para calcular e renderizar a cena
-    void renderizar(SDL_Renderer* renderer, int nColunas, int nLinhas, const Eigen::Vector3d& posicao_observador, 
-                    const Eigen::Vector3d& ponto_superior_esquerdo, double delta_x, double delta_y, double z);
+    std::vector<Forma*> objects;
+    std::vector<Luz> lights;
+    Eigen::Vector3d ambient_light;
 
-    // Métodos auxiliares para lidar com colisões e iluminação
-private:
-    Eigen::Vector3d posicao_luz;
-    std::vector<Forma*> objetos; // Lista de formas da cena
+    Cena();
+    Cena(Eigen::Vector3d ambient_light);
 
-    // Verifica a interseção e calcula a iluminação
-    void calcularIluminacao(Raio& raio, SDL_Renderer* renderer, int colunas, int linhas, double x, double y);
+    void add_object(Forma* obj);
+    void remove_object(int n);
+    bool remove_object(Forma* obj);
+
+    std::tuple<Forma*, double> get_closest_object(Raio ray);
+
+    void add_light(Luz l);
+    void remove_light(int n);
+    bool remove_light(Luz l);
+
 };
 
 #endif // CENA_H

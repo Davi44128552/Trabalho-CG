@@ -9,7 +9,7 @@
 class Esfera : public Forma {
 public:
     // Construtor
-    Esfera(Eigen::Vector3d centroEsfera, double raioEsfera, const Material& material, const Eigen::Vector3d& cor);
+    Esfera(Eigen::Vector3d centroEsfera, double raioEsfera, const Material& material);
     // Método para obter o ponto de interseção
     double obter_ti(const Raio& raio) const override;
     // Método para obter a normal da esfera
