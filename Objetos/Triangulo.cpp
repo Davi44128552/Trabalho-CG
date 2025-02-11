@@ -1,4 +1,4 @@
-# include "Triangulo.hpp"
+# include "Triangulo.h"
 
 // Implementando o construtor
 Triangulo::Triangulo(Vector3d vertice1, Vector3d vertice2, Vector3d vertice3){
