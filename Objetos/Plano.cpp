@@ -1,4 +1,4 @@
-# include "Plano.h"
+# include "Plano.hpp"
 
 // Implementando o construtor
 Plano::Plano(Eigen::Vector3d ponto_plano, Eigen::Vector3d normal){
@@ -7,7 +7,7 @@ Plano::Plano(Eigen::Vector3d ponto_plano, Eigen::Vector3d normal){
 }
 
 // Implementando a funcao que verifica se o raio intercepta o plano
-double Plano::obter_ti(const Raio& raio) const {
+double Plano::obter_ti(const Raio& raio) const{
 
 	/* Quando realizamos a deducao da verificacao de interceptacao
 	entre o raio e o plano, chegamos a seguinte formula: 

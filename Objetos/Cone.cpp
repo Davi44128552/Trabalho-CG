@@ -1,4 +1,4 @@
-# include "Cone.h"
+# include "Cone.hpp"
 
 // Implementando o construtor
 Cone::Cone(Eigen::Vector3d vertice, Eigen::Vector3d dc, double altura, double raio_base){
@@ -14,74 +14,71 @@ Cone::Cone(Eigen::Vector3d vertice, Eigen::Vector3d dc, double altura, double ra
 // Implementando a funcao que verifica se ocorre intersecao entre o raio do observador e o objeto
 double Cone::obter_ti(const Raio& raio){
 
-	// Definindo a variavel v, que equivale a posicao do vertice menos Po do raio
-	Eigen::Vector3d v = vertice - raio.Po;
 	double cos2theta = pow((altura / sqrt(altura*altura + raio_base*raio_base)), 2);
+	const double epsilon = 0.000001;
 
 	// Definindo as variaveis para o calculo do discriminante
 	double a = pow(dc.dot(raio.dr), 2) - raio.dr.dot(raio.dr) * cos2theta;
 	double b = 2 * (vertice.dot(raio.dr) * cos2theta - vertice.dot(dc) * dc.dot(raio.dr));
 	double c = vertice.dot(dc) * vertice.dot(dc) - vertice.dot(vertice) * cos2theta;
-	double epsilon = 0.000001;
-
-	// Verificando se a e proximo do absoluto
-	if (abs(a) > epsilon){
-
-		// Verificando se b nao e zero, para evitar problemas
-		if (b == 0){
-			return nan("");
-		}
-
-		double t = - (c / (2*b));
-		Eigen::Vector3d ponto_intersecao = raio.Po + t*raio.dr;
-		bool teste_do_ponto = 0 <= (vertice - ponto_intersecao).dot(dc) && (vertice - ponto_intersecao).dot(dc) <= altura; // Verificando se o ponto e valido
-
-		if (t > epsilon && teste_do_ponto ){ 
-			return t;
-		}
-	}
 
 	// Calculando o valor de t, baseado na equacao do segundo grau
 	double discriminante = b*b - 4 * a * c;
 
-	// Verificando o valor do discriminante
+	// Verificando se o dicriminante é válido
 	if (discriminante < 0){
 		return nan("");
 	}
 
-	// Calculando os valores para t
-	double t1 = (-b -std::sqrt(discriminante)) / (2.0 * a);
-	double t2 = (-b +std::sqrt(discriminante)) / (2.0 * a);
+	// Calculando as raizes da equacao
+	double t1 = (-b -sqrt(discriminante)) / (2*a);
+	double t2 = (-b + sqrt(discriminante)) / (2*a);
 
-	// Verificando se as raizes da equacao sao validas
-	for (double t: {t1, t2}){
-
-		if (t > 0){
-
-			// Verificando se 0 <= (vetice - P) * dc <= altura
-			Eigen::Vector3d ponto_intersecao = raio.Po + t*raio.dr;
-			if (0 <= (vertice - ponto_intersecao).dot(dc) && (vertice - ponto_intersecao).dot(dc) <= altura){
-
-				// Definindo em que parte estamos do cone
-				if ((vertice - ponto_intersecao).dot(dc) == 0){
-					posicao = 'b'; // base
-					std::cout << "Base" << "\n";
-				}
-
-				else{
-					posicao = 'm'; // meio
-					std::cout << "Meio" << "\n";
-				}
-
-				return t;
-
-			}
-
-		}
-
+	// Verificando se o ponto nao esta atras da origem do raio
+	if (t1 < 0 && t2 < 0){
+		return nan("");
 	}
 
+	
+	double t = std::min(t1 > 0 ? t1 : std::numeric_limits<double>::infinity(), 
+                    t2 > 0 ? t2 : std::numeric_limits<double>::infinity());
 
+	if (t == std::numeric_limits<double>::infinity()){
+		return nan("");
+	}
+
+	Eigen::Vector3d ponto_intersecao = raio.Po + raio.dr * t;
+
+	// Verificando se o ponto esta de fato no cone
+	double verificacao = 0 <= dc.dot(ponto_intersecao - vertice) && dc.dot(ponto_intersecao - vertice) <= altura;
+	if (verificacao){
+		if (dc.dot(ponto_intersecao - vertice) < epsilon){
+		posicao = 'b';
+	}
+
+	else{
+		posicao = 'm';
+	}
+		return t;
+	}
+
+	t = std::max(t1, t2);
+	ponto_intersecao = raio.Po + raio.dr * t;
+	verificacao = 0 <= dc.dot(ponto_intersecao - vertice) && dc.dot(ponto_intersecao - vertice) <= altura;
+
+	if (dc.dot(ponto_intersecao - vertice) < epsilon){
+		posicao = 'b';
+	}
+
+	else{
+		posicao = 'm';
+	}
+
+	if (verificacao){
+		return t;
+	}
+
+	// Caso nada tenha dado certo para a verificacao, retornamos nulo
 	return nan("");
 
 }
@@ -90,7 +87,7 @@ double Cone::obter_ti(const Raio& raio){
 Eigen::Vector3d Cone::obter_normal(Eigen::Vector3d ponto_intersecao) {
     // Caso estejamos na base do cone, a sua normal simplesmente será -dc
     if (posicao == 'b') {
-        return -dc;
+        return -dc.normalized();
     }
 
     // Caso estejamos na superfície lateral do cone

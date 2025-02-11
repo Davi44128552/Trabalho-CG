@@ -1,4 +1,4 @@
-#include "Esfera.h"
+#include "Esfera.hpp"
 
 // Construtor
 Esfera::Esfera(Eigen::Vector3d centroEsfera, double raioEsfera) {
