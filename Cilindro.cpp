@@ -2,7 +2,7 @@
 
 // Implementando o construtor do cilindro
 Cilindro::Cilindro(double altura, double raio_base, Eigen::Vector3d dc, Eigen::Vector3d centro_base, const Material& material)
-	: Forma(material), altura(altura), raio_base(raio_base), dc(dc.normalized()), centro_base(centro_base), posicao('i') {}
+	: Forma(material), altura(altura), raio_base(raio_base), dc(dc.normalized()), centro_base(centro_base) {}
 
 // Implementando a funcao para verificar se existe intersecao entre o raio e o cilindro
 double Cilindro::obter_ti(const Raio& raio)const{
