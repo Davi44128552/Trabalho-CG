@@ -2,7 +2,7 @@
 # define TRIANGULO_H
 
 # include <Eigen/Dense>
-# include "Raio.hpp"
+# include "Raio.h"
 
 using namespace Eigen;
 
