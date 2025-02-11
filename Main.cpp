@@ -10,6 +10,7 @@
 #include "Luz.h"
 #include "Cena.h"
 #include "Material.h"
+#include "Cilindro.h"
 using namespace std;
 using namespace Eigen;
 
@@ -17,7 +18,7 @@ using namespace Eigen;
 using namespace std;
 
 int main() {
-    Vector3d p0(0,0,0);
+    Vector3d p0(0,0,10);
     
     double aspect_ratio = 16.0/9.0;
     double viewport_width = 3.2;
@@ -58,6 +59,9 @@ int main() {
     Esfera* sphere = new Esfera(sphere_center, sphere_radius, mat_sphere);
     //Plano* plane = new Plane(plane_p0, plane_normal, mat_p1);
     //Plane* plane2 = new Plane(plane2_p0, plane2_normal, mat_p2);
+    Vector3d cylinder_base_center(2.0, 0.0, -(viewport_distance + 2.0 / 2.0));  // Posição do cilindro ao lado da esfera
+    Vector3d cylinder_direction(0.0, 1.0, 0.0);
+    Cilindro* cilindro = new Cilindro (0.9, 0.5, cylinder_direction, cylinder_base_center, mat_sphere);
 
     Luz light1 = Luz(
         Vector3d(-0.8, 0.8, 0.0),
@@ -81,6 +85,7 @@ int main() {
     scene.add_object(sphere);
     //scene.add_object(plane);
     //scene.add_object(plane2);
+    scene.add_object(cilindro);
     scene.add_light(light1);
     scene.add_light(light2);
 
