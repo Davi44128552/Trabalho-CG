@@ -28,7 +28,7 @@ int main() {
     int image_height = image_width/aspect_ratio;
 
     double sphere_radius = 1.0;
-    Vector3d sphere_center(0,0, -(viewport_distance + sphere_radius));
+    Vector3d sphere_center(0,0,0);
 
     Vector3d plane_p0(0.0, -1.8, 0.0);
     Vector3d plane_normal(0.0, 1.0, 0.0);
@@ -79,7 +79,7 @@ int main() {
     Camera camera = Camera(p0, viewport_width, viewport_height, image_width, image_height, viewport_distance, bg_color);
 
     Vector3d camera_position = p0;
-    double camera_speed = 0.001;
+    double camera_speed = 1;
 
     Cena scene = Cena(ambient_light);
     scene.add_object(sphere);
@@ -108,15 +108,17 @@ int main() {
                 goto quit;
             } else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
-                    case SDLK_w: camera_position[2] -= camera_speed; break; // Frente
-                    case SDLK_s: camera_position[2] += camera_speed; break; // Trás
-                    case SDLK_a: camera_position[0] -= camera_speed; break; // Esquerda
-                    case SDLK_d: camera_position[0] += camera_speed; break; // Direita
-                    case SDLK_q: camera_position[1] += camera_speed; break; // Cima
-                    case SDLK_e: camera_position[1] -= camera_speed; break; // Baixo
+                    case SDLK_w: camera_position[2] -= 1; break; // Frente
+                    case SDLK_s: camera_position[2] += 1; break; // Trás
+                    case SDLK_a: camera_position[0] -= 1; break; // Esquerda
+                    case SDLK_d: camera_position[0] += 1; break; // Direita
+                    case SDLK_q: camera_position[1] += 1; break; // Cima
+                    case SDLK_e: camera_position[1] -= 1; break; // Baixo
                 }
                 
-                
+                camera.setPosition(camera_position);
+                camera.draw_scene(renderer, scene);
+        
             }
         }
         // draw scene
@@ -127,7 +129,7 @@ int main() {
         auto currentTime = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsedTime = currentTime - startTime;
         if (elapsedTime.count() >= 1.0) {
-            std::cout << "FPS: " << frameCount << std::endl;
+            //std::cout << "FPS: " << frameCount << std::endl;
             frameCount = 0;
             startTime = currentTime;
         }

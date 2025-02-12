@@ -2,6 +2,7 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include <iostream>
 
 Camera::Camera() : pos(Eigen::Vector3d()), bg_color(Eigen::Vector3d(1.0, 1.0, 1.0)), viewport(Viewport()) {}
 
@@ -121,7 +122,16 @@ Camera::Viewport::Viewport(Eigen::Vector3d pos, double width, double height, dou
 }
 
 void Camera::Viewport::updatePosition(const Eigen::Vector3d& newPos) {
-    pos = newPos;
-    top_left = Eigen::Vector3d(pos.x() - width / 2.0, pos.y() + height / 2.0, pos.z());
-    p00 = top_left + dx / 2 - dy / 2;
+    // Atualiza a posição do viewport
+    std::cout << "Atualizando posição de: " << this->pos.transpose() << " para: " << newPos.transpose() << std::endl;
+    this->pos = newPos;
+    // Recalcula o top_left (canto superior esquerdo do viewport)
+    this->top_left = Eigen::Vector3d(newPos.x() - width / 2.0, newPos.y() + height / 2.0, newPos.z());
+
+    // Recalcula o ponto p00 (centro do primeiro pixel do viewport)
+    this->p00 = top_left + dx / 2 - dy / 2;
+
+    // Recalcula dx e dy com base na nova posição
+    this->dx = Eigen::Vector3d(width / cols, 0.0, 0.0);
+    this->dy = Eigen::Vector3d(0.0, height / rows, 0.0);
 }

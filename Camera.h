@@ -15,7 +15,7 @@ public:
 
     void draw_scene(SDL_Renderer* renderer, Cena scene);
     void setPosition(const Eigen::Vector3d& newPos) {
-        pos = newPos;
+        this->pos[2] = pos[2]-1;
         viewport.updatePosition(newPos);
     }
     Eigen::Vector3d getViewportPosition() const { return viewport.pos; }
