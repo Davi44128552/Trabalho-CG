@@ -1,16 +1,34 @@
 #include "Camera.h"
+#include <thread>
+#include <mutex>
+#include <vector>
 
 Camera::Camera() : pos(Eigen::Vector3d()), bg_color(Eigen::Vector3d(1.0, 1.0, 1.0)), viewport(Viewport()) {}
 
 Camera::Camera(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance, Eigen::Vector3d bg_color)
     : pos(pos), bg_color(bg_color), viewport(Viewport(Eigen::Vector3d(pos.x(), pos.y(), pos.z() - viewport_distance), width, height, cols, rows)) {}
 
+// Mutex para proteger o acesso ao renderizador
+std::mutex renderMutex;
+
 void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
     SDL_SetRenderDrawColor(renderer, bg_color.x(), bg_color.y(), bg_color.z(), 255);
     SDL_RenderClear(renderer);
 
-    for (int row = 0; row < viewport.rows; row++) {
-        for (int col = 0; col < viewport.cols; col++) {
+    // Número de threads disponíveis
+    unsigned int num_threads = std::thread::hardware_concurrency() * 3; // Usar 3x o número de threads disponíveis
+    std::vector<std::thread> threads;
+
+    // Número total de pixels
+    int total_pixels = viewport.rows * viewport.cols;
+    int pixels_per_thread = total_pixels / num_threads;
+
+    // Função que cada thread executará
+    auto render_chunk = [&](int start_pixel, int end_pixel) {
+        for (int pixel = start_pixel; pixel < end_pixel; pixel++) {
+            int row = pixel / viewport.cols;
+            int col = pixel % viewport.cols;
+
             Eigen::Vector3d dr = ((viewport.p00 + viewport.dx * col - viewport.dy * row) - pos).normalized();
             Raio r(pos, dr);
 
@@ -49,9 +67,23 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
                     ieye += iamb + idif + iesp;
                 }
 
+                // Proteger o acesso ao renderizador com mutex
+                std::lock_guard<std::mutex> lock(renderMutex);
                 draw_pixel(renderer, col, row, ieye.cwiseMin(1.0).cwiseMax(0.0) * 255.0);
             }
         }
+    };
+
+    // Criar threads
+    for (unsigned int i = 0; i < num_threads; i++) {
+        int start_pixel = i * pixels_per_thread;
+        int end_pixel = (i == num_threads - 1) ? total_pixels : start_pixel + pixels_per_thread;
+        threads.emplace_back(render_chunk, start_pixel, end_pixel);
+    }
+
+    // Aguardar todas as threads terminarem
+    for (auto& thread : threads) {
+        thread.join();
     }
 
     SDL_RenderPresent(renderer);

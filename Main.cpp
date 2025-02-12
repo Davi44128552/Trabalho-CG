@@ -115,10 +115,10 @@ int main() {
                     case SDLK_q: camera_position[1] += camera_speed; break; // Cima
                     case SDLK_e: camera_position[1] -= camera_speed; break; // Baixo
                 }
-                camera.setPosition(camera_position);
+                
+                
             }
         }
-
         // draw scene
         camera.draw_scene(renderer, scene);
 

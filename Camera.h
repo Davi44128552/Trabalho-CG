@@ -18,6 +18,7 @@ public:
         pos = newPos;
         viewport.updatePosition(newPos);
     }
+    Eigen::Vector3d getViewportPosition() const { return viewport.pos; }
 
 private:
     class Viewport {
