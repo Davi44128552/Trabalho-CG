@@ -4,33 +4,35 @@
 # include <Eigen/Dense>
 # include "Raio.h"
 
-using namespace Eigen;
 
 // Classe do triangulo
-class Triangulo{
-
-private:
-	// Atributos do triangulo
-	// Os 3 vertices do triangulo
-	Vector3d vertice1;
-	Vector3d vertice2;
-	Vector3d vertice3;
-
-	// Normal do triangulo
-	Vector3d normal;
+class Triangulo {
 
 public:
 	// Construtor
-	Triangulo(Vector3d vertice1, Vector3d vertice2, Vector3d vertice3);
+	Triangulo(Eigen::Vector3d vertice1, Eigen::Vector3d vertice2, Eigen::Vector3d vertice3);
 
 	// Funcao para verificar se ocorre intersecao entre o raio e o objeto
-	double obter_ti(const Raio& raio);
+	double obter_ti(const Raio& raio) const;
 
-	// Funcao para obter a normal
-	Vector3d obter_normal();
+	// Funcao para calcular e obter a normal
+	Eigen::Vector3d obter_normal() const;
 
-	// Funcao para CALCULAR a normal
-	void calcular_normal();
+	// Funcoes para realizar as transformacoes nos objetos
+	void translacao(Eigen::Vector3d d);
+	void rotacionar(double angulo, Eigen::Vector3d eixo);
+	void escalonar(Eigen::Vector3d s);
+	void cisalhar(double shXY, double shXZ, double shYX, double shYZ, double shZX, double shZY);
+	
+private:
+	// Atributos do triangulo
+	// Os 3 vertices do triangulo
+	Eigen::Vector3d vertice1;
+	Eigen::Vector3d vertice2;
+	Eigen::Vector3d vertice3;
+
+	// Normal do triangulo
+	Eigen::Vector3d normal;
 
 };
 
