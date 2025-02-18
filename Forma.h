@@ -13,8 +13,16 @@ public:
     virtual Eigen::Vector3d obter_normal(const Eigen::Vector3d& ponto) const = 0;
     Material getMaterial() const {return material;}
     virtual ~Forma() = default;
+    void setSelected(bool estado){
+        selected = estado;
+    }
+    bool isSelected()const{
+        return selected;
+        bool selected;
+    }
 protected:
     Material material;
+    bool selected;
 };
 
 #endif // FORMA_H

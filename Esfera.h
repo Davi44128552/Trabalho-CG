@@ -15,6 +15,7 @@ public:
     // Método para obter a normal da esfera
     Eigen::Vector3d obter_normal(const Eigen::Vector3d& ponto) const override;
 
+
 private:
     // Atributos da esfera
     Eigen::Vector3d centroEsfera;

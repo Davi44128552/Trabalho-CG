@@ -8,6 +8,16 @@
 
 class Camera {
 public:
+    class Viewport {
+    public:
+        Eigen::Vector3d pos, dx, dy, top_left, p00;
+        double width, height;
+        int cols, rows;
+
+        Viewport();
+        Viewport(Eigen::Vector3d pos, double width, double height, double cols, double rows);
+        void updatePosition(const Eigen::Vector3d& newPos);
+    };
     Eigen::Vector3d pos, bg_color;
 
     Camera();
@@ -19,18 +29,9 @@ public:
         viewport.updatePosition(newPos);
     }
     Eigen::Vector3d getViewportPosition() const { return viewport.pos; }
+    const Viewport& getViewport() const { return viewport; }
 
 private:
-    class Viewport {
-    public:
-        Eigen::Vector3d pos, dx, dy, top_left, p00;
-        double width, height;
-        int cols, rows;
-
-        Viewport();
-        Viewport(Eigen::Vector3d pos, double width, double height, double cols, double rows);
-        void updatePosition(const Eigen::Vector3d& newPos);
-    };
 
     Viewport viewport;
 

@@ -119,6 +119,29 @@ int main() {
                 camera.setPosition(camera_position);
                 camera.draw_scene(renderer, scene);
         
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                int mouseX = event.button.x;
+                int mouseY = event.button.y;
+                
+                Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
+
+                // Raio gerado a partir do clique do mouse (ponto de origem e direção)
+                Raio raioCLique(camera.pos, dr);
+                
+                auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
+                
+                if (forma_selecionada) {
+                    // Desmarcar todas as formas
+                    for (Forma* obj : scene.objects) {
+                        obj->setSelected(false);
+                    }
+                    
+                    // Marcar forma clicada
+                    forma_selecionada->setSelected(true);
+                    
+                    // Re-renderizar cena
+                    camera.draw_scene(renderer, scene);
+                }
             }
         }
         // draw scene

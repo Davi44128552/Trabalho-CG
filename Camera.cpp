@@ -67,6 +67,9 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
 
                     ieye += iamb + idif + iesp;
                 }
+                if(closest_shape->isSelected()){
+                    ieye = Eigen::Vector3d(1.0, 1.0, 0.0);
+                }
 
                 // Proteger o acesso ao renderizador com mutex
                 std::lock_guard<std::mutex> lock(renderMutex);
