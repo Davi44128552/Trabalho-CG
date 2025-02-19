@@ -154,6 +154,7 @@ std::vector<Triangulo> faces = {
     auto startTime = std::chrono::high_resolution_clock::now();
     // main loop
     SDL_Event event;
+    camera.draw_scene(renderer, scene);
     while (true) {
         // event handler
         while (SDL_PollEvent(&event) != 0) {
@@ -171,10 +172,34 @@ std::vector<Triangulo> faces = {
                 
                 camera.setPosition(camera_position);
         
-            }
-        }
+            }else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                int mouseX = event.button.x;
+                int mouseY = event.button.y;
+                
+
+                
+                Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
+                // Raio gerado a partir do clique do mouse (ponto de origem e direção)
+                Raio raioCLique(camera.pos, dr);
+                
+                auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
+                
+                if (forma_selecionada) {
+                    // Desmarcar todas as formas
+                    for (Forma* obj : scene.objects) {
+                        obj->setSelecionada(false);
+                    }
+                    
+                    // Marcar forma clicada
+                    forma_selecionada->setSelecionada(true);
+                    
+                    camera.show_context_menu(renderer, mouseX, mouseY, forma_selecionada, scene);
+                    // Re-renderizar cena
+                    //camera.draw_scene(renderer, scene);
+                }
+            }}
         // draw scene
-        camera.draw_scene(renderer, scene);
+        //camera.draw_scene(renderer, scene);
 
         // printa o FPS no terminal
         frameCount++;

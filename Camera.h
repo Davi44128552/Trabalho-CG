@@ -7,9 +7,20 @@
 #include "Raio.h"
 
 class Camera {
-public:
+    public:
+    class Viewport {
+    public:
+        Eigen::Vector3d pos, dx, dy, top_left, p00;
+        double width, height;
+        double viewport_distance;
+        int cols, rows;
+    
+        Viewport();
+        Viewport(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance);
+        void updatePosition(const Eigen::Vector3d& newPos);
+    };
     Eigen::Vector3d pos, bg_color;
-
+    
     Camera();
     Camera(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance, Eigen::Vector3d bg_color);
 
@@ -19,19 +30,10 @@ public:
         viewport.updatePosition(newPos);
     }
     Eigen::Vector3d getViewportPosition() const { return viewport.pos; }
+    const Viewport& getViewport() const { return viewport; }
+    void show_context_menu(SDL_Renderer* renderer, int x, int y, Forma* objeto, Cena* scene);
 
 private:
-    class Viewport {
-    public:
-        Eigen::Vector3d pos, dx, dy, top_left, p00;
-        double width, height;
-        double viewport_distance;
-        int cols, rows;
-
-        Viewport();
-        Viewport(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance);
-        void updatePosition(const Eigen::Vector3d& newPos);
-    };
 
     Viewport viewport;
 

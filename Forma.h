@@ -13,8 +13,16 @@ public:
     virtual Intersecao obter_intersecao(const Raio& raio) const = 0;
     Material getMaterial() const {return material;}
     virtual ~Forma() = default;
+    void setSelecionada(bool estado){
+        selecionada = estado;
+    }
+    bool isSelecioanda()const{
+        return selecionada;
+        bool selecionada;
+    }
 protected:
     Material material;
+    bool selecionada;
 };
 
 #endif // FORMA_H
