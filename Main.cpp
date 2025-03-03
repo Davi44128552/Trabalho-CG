@@ -192,14 +192,13 @@ std::vector<Triangulo> faces = {
                     
                     // Marcar forma clicada
                     forma_selecionada->setSelecionada(true);
-                    
-                    camera.show_context_menu(renderer, mouseX, mouseY, forma_selecionada, scene);
+                   
                     // Re-renderizar cena
-                    //camera.draw_scene(renderer, scene);
+                    camera.draw_scene(renderer, scene);
                 }
             }}
         // draw scene
-        //camera.draw_scene(renderer, scene);
+        camera.draw_scene(renderer, scene);
 
         // printa o FPS no terminal
         frameCount++;

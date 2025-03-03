@@ -13,7 +13,7 @@ Camera::Camera(Eigen::Vector3d pos, double width, double height, double cols, do
 // Mutex para proteger o acesso ao renderizador
 std::mutex renderMutex;
 
-void Camera::draw_scene(SDL_Renderer* renderer, Cena* scene) {
+void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
     SDL_SetRenderDrawColor(renderer, bg_color.x(), bg_color.y(), bg_color.z(), 255);
     SDL_RenderClear(renderer);
 
@@ -93,46 +93,6 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena* scene) {
     }
 
     SDL_RenderPresent(renderer);
-}
-
-void Camera::show_context_menu(SDL_Renderer* renderer, int x, int y, Forma* objeto, Cena* scene) {
-    bool menu_open = true;
-    SDL_Rect menu_box = {x, y, 120, 60};
-    SDL_Rect delete_option = {x + 10, y + 10, 100, 20};
-    SDL_Rect move_option = {x + 10, y + 35, 100, 20};
-    
-    SDL_Event event;
-    while (menu_open) {
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_MOUSEBUTTONDOWN) {
-                int mx = event.button.x;
-                int my = event.button.y;
-
-                // Se clicar fora do menu, fecha
-                if (mx < x || mx > x + 120 || my < y || my > y + 60) {
-                    menu_open = false;
-                }
-
-                // Excluir objeto
-                if (mx > delete_option.x && mx < delete_option.x + 100 &&
-                    my > delete_option.y && my < delete_option.y + 20) {
-                    scene.remove_object(objeto);
-                    menu_open = false;
-                }
-
-                
-            }
-        }
-
-        // Desenhar menu
-
-
-        SDL_SetRenderDrawColor(renderer, 200, 0, 0, 255);
-        SDL_RenderFillRect(renderer, &delete_option);
-        SDL_RenderPresent(renderer);
-        draw_scene(renderer, scene);
-
-    }
 }
 
 

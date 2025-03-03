@@ -31,7 +31,6 @@ class Camera {
     }
     Eigen::Vector3d getViewportPosition() const { return viewport.pos; }
     const Viewport& getViewport() const { return viewport; }
-    void show_context_menu(SDL_Renderer* renderer, int x, int y, Forma* objeto, Cena* scene);
 
 private:
 
