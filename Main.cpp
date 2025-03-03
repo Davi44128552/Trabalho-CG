@@ -214,11 +214,10 @@ ImGui_ImplSDLRenderer2_Init(renderer);
                     showMenu = false; // Clicked nothing, hide menu
                 }
             }}
-        // draw scene
-        ImGui_ImplSDL2_NewFrame();
         camera.draw_scene(renderer, scene);
+        ImGui_ImplSDL2_NewFrame();
         ImGui_ImplSDLRenderer2_NewFrame();
-
+        ImGui::NewFrame();
         
 
         // Show context menu if an object is selected
@@ -228,10 +227,10 @@ ImGui_ImplSDLRenderer2_Init(renderer);
 
             ImGui::Begin("Object Menu", &showMenu, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
             if (ImGui::Button("Remove Object")) {
-                //scene.remove_object(selectedObject);
+                scene.remove_object(selectedObject);
                 selectedObject = nullptr;
-                //showMenu = false;
-                //camera.draw_scene(renderer, scene); // Refresh the scene
+                showMenu = false;
+                camera.draw_scene(renderer, scene); // Refresh the scene
             }
             ImGui::End();
         }
