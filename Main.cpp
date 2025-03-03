@@ -14,6 +14,9 @@
 #include "Cilindro.h"
 #include "Plano.h"
 #include "Malha.h"
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_sdlrenderer2.h"
 
 using namespace std;
 using namespace Eigen;
@@ -133,13 +136,13 @@ std::vector<Triangulo> faces = {
     double camera_speed = 1;
 
     Cena scene = Cena(ambient_light);
-    scene.add_object(malha);
+    //scene.add_object(malha);
     scene.add_object(sphere);
     // scene.add_object(plane);
     // scene.add_object(plane2);
-    scene.add_object(cilindro);
-    scene.add_object(cone);
-    scene.add_light(light1);
+    //scene.add_object(cilindro);
+    //scene.add_object(cone);
+    //scene.add_light(light1);
     scene.add_light(light2);
 
     // SDL init
@@ -149,15 +152,29 @@ std::vector<Triangulo> faces = {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL) { printf("SDL_CreateRenderer Error: %s\n", SDL_GetError()); SDL_DestroyWindow(window); SDL_Quit(); return 1; }
 
+
+    IMGUI_CHECKVERSION();
+ImGui::CreateContext();
+ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+// Setup Platform/Renderer backends
+ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+ImGui_ImplSDLRenderer2_Init(renderer);
     // contador de fps
     int frameCount = 0;
     auto startTime = std::chrono::high_resolution_clock::now();
     // main loop
     SDL_Event event;
-    camera.draw_scene(renderer, scene);
+    //camera.draw_scene(renderer, scene);
+    static Forma* selectedObject = nullptr;
+    static int clickX = 0, clickY = 0;
+    static bool showMenu = false;
+    
     while (true) {
-        // event handler
         while (SDL_PollEvent(&event) != 0) {
+            // Pass events to ImGui
+            ImGui_ImplSDL2_ProcessEvent(&event);
+    
             if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE)) {
                 goto quit;
             } else if (event.type == SDL_KEYDOWN) {
@@ -175,9 +192,7 @@ std::vector<Triangulo> faces = {
             }else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                
-
-                
+            
                 Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
                 // Raio gerado a partir do clique do mouse (ponto de origem e direção)
                 Raio raioCLique(camera.pos, dr);
@@ -185,21 +200,46 @@ std::vector<Triangulo> faces = {
                 auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
                 
                 if (forma_selecionada) {
-                    // Desmarcar todas as formas
                     for (Forma* obj : scene.objects) {
                         obj->setSelecionada(false);
                     }
                     
-                    // Marcar forma clicada
                     forma_selecionada->setSelecionada(true);
-                   
-                    // Re-renderizar cena
-                    camera.draw_scene(renderer, scene);
+                    selectedObject = forma_selecionada;
+                    clickX = mouseX;
+                    clickY = mouseY;
+                    showMenu = true; // Show menu on click
+                    //camera.draw_scene(renderer, scene);
+                } else {
+                    showMenu = false; // Clicked nothing, hide menu
                 }
             }}
         // draw scene
+        ImGui_ImplSDL2_NewFrame();
         camera.draw_scene(renderer, scene);
+        ImGui_ImplSDLRenderer2_NewFrame();
 
+        
+
+        // Show context menu if an object is selected
+        if (selectedObject) {
+            ImGui::SetNextWindowPos(ImVec2(clickX, clickY));
+            ImGui::SetNextWindowBgAlpha(1.0f);  
+
+            ImGui::Begin("Object Menu", &showMenu, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+            if (ImGui::Button("Remove Object")) {
+                //scene.remove_object(selectedObject);
+                selectedObject = nullptr;
+                //showMenu = false;
+                //camera.draw_scene(renderer, scene); // Refresh the scene
+            }
+            ImGui::End();
+        }
+
+        // Render ImGui
+        ImGui::Render();
+        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+        SDL_RenderPresent(renderer);
         // printa o FPS no terminal
         frameCount++;
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -211,7 +251,9 @@ std::vector<Triangulo> faces = {
         }
     }
     quit:
-
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
     // SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

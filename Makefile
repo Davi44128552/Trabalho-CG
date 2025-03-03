@@ -1,51 +1,44 @@
-# Definindo se estamos em modo de debug ou release
-DEBUG ?= 1  # Se DEBUG estiver setado, irá ativar a compilação com depuração. Caso contrário, será em modo release.
+# Variáveis do compilador e flags
+CXX       = g++
+CXXFLAGS  = -Wall -g $(shell sdl2-config --cflags) -I. -I./imgui -I./imgui/backends -I/usr/include/eigen3
+LDFLAGS   = $(shell sdl2-config --libs)
 
-# Comandos do compilador
-CXX = g++
+# Fontes e objetos
+MAIN_SRC   = $(wildcard *.cpp)
+IMGUISRC   = $(wildcard imgui/*.cpp)
 
-# Flags de compilação: C++17, Eigen3, SDL2 e multithreading (necessário para SDL2)
-# Se DEBUG for 1, adiciona a flag -g para depuração
-ifeq ($(DEBUG), 1)
-    CXXFLAGS = -std=c++17 -I/usr/include/eigen3 -I/usr/include/SDL2 -D_REENTRANT -g -O0
-else
-    CXXFLAGS = -std=c++17 -I/usr/include/eigen3 -I/usr/include/SDL2 -D_REENTRANT -O2 -g
-endif
+IMGUI_BACKEND_SRC = imgui/backends/imgui_impl_sdl2.cpp imgui/backends/imgui_impl_sdlrenderer2.cpp
 
-# Flags de linkagem
-LDFLAGS = -lSDL2
+IMGUI_BACKEND_OBJ = $(patsubst imgui/backends/%.cpp, obj/imgui_backends_%.o, $(IMGUI_BACKEND_SRC))
 
-# Diretórios
-SRC_DIR = .
-OBJ_DIR = ./obj
-BIN_DIR = ./bin
 
-# Arquivo de saída
-TARGET = $(BIN_DIR)/executavel
+MAIN_OBJ   = $(patsubst %.cpp, obj/%.o, $(notdir $(MAIN_SRC)))
+IMGUI_OBJ  = $(patsubst imgui/%.cpp, obj/imgui_%.o, $(IMGUISRC))
 
-# Arquivos fonte
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+OBJ        = $(MAIN_OBJ) $(IMGUI_OBJ) $(IMGUI_BACKEND_OBJ)
 
-# Arquivos objeto
-OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+TARGET     = bin/main
 
-# Regras de compilação
+# Regra principal
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
+# Linka todos os objetos para gerar o executável na pasta bin
+$(TARGET): $(OBJ)
+	@mkdir -p bin
+	$(CXX) -o $@ $^ $(LDFLAGS)
+obj/imgui_backends_%.o: imgui/backends/%.cpp
+	@mkdir -p obj
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+# Regra para compilar os .cpp que estão na raiz
+obj/%.o: %.cpp
+	@mkdir -p obj
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Excuete "make clean" para remover os arquivos objeto e o executável
+# Regra para compilar os .cpp da pasta imgui
+obj/imgui_%.o: imgui/%.cpp
+	@mkdir -p obj
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Limpa os arquivos compilados
 clean:
-	rm -rf $(OBJ_DIR) $(BIN_DIR)
-
-run: all
-	./bin/executavel
-
-# Se você quiser rodar em modo debug, basta rodar "make DEBUG=1"
-.PHONY: all clean
+	rm -rf obj/*.o bin/main
