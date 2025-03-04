@@ -23,8 +23,10 @@ public:
 	// Funcoes das transformacoes
 	void translacao(Eigen::Vector3d d);
 	void rotacionar(double angulo, Eigen::Vector3d eixo);
+	void rotacionar_eixo(char eixo, double angulo);
 	void escalonar(Eigen::Vector3d s);
 	void cisalhar(double shXY, double shXZ, double shYX, double shYZ, double shZX, double shZY);
+	Eigen::Vector3d calcularCentroide() const;
 	
 private:
 	// Atributos

@@ -2,7 +2,7 @@
 
 // Implementando o construtor
 Triangulo::Triangulo(Eigen::Vector3d vertice1, Eigen::Vector3d vertice2, Eigen::Vector3d vertice3)
-	: vertice1(vertice1), vertice2(vertice2), vertice3(vertice3) 
+	: vertice1(vertice1), vertice2(vertice2), vertice3(vertice3)
 	{
 		normal = obter_normal();
 	}
@@ -77,11 +77,6 @@ void Triangulo::rotacionar(double angulo, Eigen::Vector3d eixo) {
     // Calculando o centroide do triangulo
     Eigen::Vector3d centroide = (vertice1 + vertice2 + vertice3) / 3.0;
 
-    // Transladando os vertices para a origem
-    vertice1 -= centroide;
-    vertice2 -= centroide;
-    vertice3 -= centroide;
-
     // Criando a matriz de rotacao usando a formula de Rodrigues
     Eigen::Matrix3d K;
     K <<    0, -eixo.z(), eixo.y(),
@@ -95,13 +90,48 @@ void Triangulo::rotacionar(double angulo, Eigen::Vector3d eixo) {
     vertice2 = R * vertice2;
     vertice3 = R * vertice3;
 
-    // Transladando os vertices de volta para a posicao original
-    vertice1 += centroide;
-    vertice2 += centroide;
-    vertice3 += centroide;
-
     // Atualizando a normal do triângulo
     normal = obter_normal();
+}
+
+void Triangulo::rotacionar_eixo(char eixo, double angulo){
+
+  // Definindo a matriz
+  Eigen::Matrix3d K;
+
+  // Convertendo o angulo para radianos
+  double anguloRad = angulo * M_PI / 180.0;
+
+  // Verificando em torno de qual eixo sera rotacionado
+  if (eixo == 'x'){
+    K <<    1, 0, 0,
+            0, cos(anguloRad), -sin(anguloRad),
+            0, sin(anguloRad), cos(anguloRad);
+  }
+
+  else if (eixo == 'y'){
+    K <<    cos(anguloRad), 0, sin(anguloRad),
+            0, 1, 0,
+            -sin(anguloRad), 0, cos(anguloRad);
+  }
+
+  else if (eixo == 'z'){
+    K <<    cos(anguloRad), -sin(anguloRad), 0,
+            sin(anguloRad), cos(anguloRad), 0,
+            0, 0, 1;
+  }
+
+  else{
+    return; // Para casos invalidos
+  }
+
+  // Reposicionando os vertices de acordo com as matrizes
+  vertice1 = K * vertice1;
+  vertice2 = K * vertice2;
+  vertice3 = K * vertice3;
+
+  // Atualizando a normal
+  normal = obter_normal();
 }
 
 void Triangulo::escalonar(Eigen::Vector3d s){
@@ -110,13 +140,6 @@ void Triangulo::escalonar(Eigen::Vector3d s){
 
     // Matrizes de transformacao para transladar, escalar e transladar de volta
 
-    // Matrizes de translacao para a origem
-    Eigen::Matrix4d trans_origem;
-    trans_origem << 1, 0, 0, -centroide.x(),
-                     0, 1, 0, -centroide.y(),
-                     0, 0, 1, -centroide.z(),
-                     0, 0, 0, 1;
-
     // Matriz para escalonar o nosso objeto
     Eigen::Matrix4d matriz_escala;
     matriz_escala << s.x(), 0,  0,  0,
@@ -124,15 +147,9 @@ void Triangulo::escalonar(Eigen::Vector3d s){
                    0, 0, s.z(), 0,
                    0, 0, 0, 1;
 
-    // Matrizes de translacao para voltar ao seu ponto anterior
-    Eigen::Matrix4d trans_voltar;
-    trans_voltar << 1, 0, 0, centroide.x(),
-                 0, 1, 0, centroide.y(),
-                 0, 0, 1, centroide.z(),
-                 0, 0, 0, 1;
 
     // Multiplicando as matrizes para a transformação final
-    Eigen::Matrix4d transformationMatrix = trans_voltar * matriz_escala * trans_origem;
+    Eigen::Matrix4d transformationMatrix = matriz_escala;
 
     // Aplicando a transformacao nos vertices
     	// Nossos vertices serao atualizados para R4
@@ -154,15 +171,6 @@ void Triangulo::escalonar(Eigen::Vector3d s){
 }
 
 void Triangulo::cisalhar(double shXY, double shXZ, double shYX, double shYZ, double shZX, double shZY) {
-    // Calculando o centroide do triângulo
-    Eigen::Vector3d centroide = (vertice1 + vertice2 + vertice3) / 3.0;
-
-    // Matriz de translação para a origem
-    Eigen::Matrix4d transToOrigin;
-    transToOrigin << 1, 0, 0, -centroide.x(),
-                     0, 1, 0, -centroide.y(),
-                     0, 0, 1, -centroide.z(),
-                     0, 0, 0, 1;
 
     // Matriz de cisalhamento
     Eigen::Matrix4d shearMatrix;
@@ -171,15 +179,9 @@ void Triangulo::cisalhar(double shXY, double shXZ, double shYX, double shYZ, dou
                    shZX, shZY, 1, 0,
                    0, 0, 0, 1;
 
-    // Matriz de translação de volta
-    Eigen::Matrix4d transBack;
-    transBack << 1, 0, 0, centroide.x(),
-                 0, 1, 0, centroide.y(),
-                 0, 0, 1, centroide.z(),
-                 0, 0, 0, 1;
 
     // Multiplicando as matrizes para obter a matriz de transformação final
-    Eigen::Matrix4d transformationMatrix = transBack * shearMatrix * transToOrigin;
+    Eigen::Matrix4d transformationMatrix = shearMatrix;
 
     // Aplicando a transformação nos vértices
     Eigen::Vector4d v1Transformed(vertice1.x(), vertice1.y(), vertice1.z(), 1);
