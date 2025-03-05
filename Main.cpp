@@ -212,13 +212,6 @@ std::vector<Eigen::Vector3d> vertices = {
                     case SDLK_o: camera.zoomIn(1.1); break; // zoom in
                     case SDLK_i: camera.zoomOut(1.1); break; // zoom out
 
-
-                    case SDLK_f: malha->translacao(Eigen::Vector3d(1, 1, 1)); break;
-                    case SDLK_g: malha->rotacionar_quaternio(45, Eigen::Vector3d(1, 1, 1)); break;
-                    case SDLK_h: malha->rotacionar_eixo('x', 30); break;
-                    case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
-                    case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break;
-
                     case SDLK_DELETE: {
                         // Procurar o objeto selecionado
                         Forma* selecionado = nullptr;
