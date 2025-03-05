@@ -178,6 +178,24 @@ std::vector<Triangulo> faces = {
                     case SDLK_h: malha->rotacionar_eixo('x', 30); break;
                     case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
                     case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break;
+
+                    case SDLK_DELETE: {
+                        // Procurar o objeto selecionado
+                        Forma* selecionado = nullptr;
+                        for (Forma* obj : scene.objects) {
+                            if (obj->isSelecioanda()) {
+                                selecionado = obj;
+                                break;
+                            }
+                        }
+                        // Se encontrou, remover e redesenhar
+                        if (selecionado) {
+                            if (scene.remove_object(selecionado)) {
+                                camera.draw_scene(renderer, scene);
+                            }
+                        }
+                        break;
+                    }
                 }
                 
                 camera.setPosition(camera_position);
