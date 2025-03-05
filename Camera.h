@@ -14,13 +14,13 @@ class Camera {
         double width, height;
         double viewport_distance;
         int cols, rows;
-    
+
         Viewport();
         Viewport(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance);
         void updatePosition(const Eigen::Vector3d& newPos);
     };
     Eigen::Vector3d pos, bg_color;
-    
+
     Camera();
     Camera(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance, Eigen::Vector3d bg_color);
 
@@ -31,6 +31,11 @@ class Camera {
     }
     Eigen::Vector3d getViewportPosition() const { return viewport.pos; }
     const Viewport& getViewport() const { return viewport; }
+
+    // Funcoes para realizar zoom in e zoom out
+    void zoomIn(double factor);
+    void zoomOut(double factor);
+
 
 private:
 
