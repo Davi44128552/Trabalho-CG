@@ -7,7 +7,7 @@
 #include "Raio.h"
 
 class Camera {
-    public:
+public:
     class Viewport {
     public:
         Eigen::Vector3d pos, dx, dy, top_left, p00;

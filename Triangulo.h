@@ -26,7 +26,7 @@ public:
 
 	// Funcoes para realizar as transformacoes nos objetos
 	void translacao(Eigen::Vector3d d);
-	void rotacionar(double angulo, Eigen::Vector3d eixo);
+	void rotacionar_quaternio(double angulo, Eigen::Vector3d eixo);
     void rotacionar_eixo(char eixo, double angulo);
 	void escalonar(Eigen::Vector3d s);
 	void cisalhar(double shXY, double shXZ, double shYX, double shYZ, double shZX, double shZY);

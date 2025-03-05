@@ -4,10 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
-// #include "Raio.h"
 #include "Cone.h"
 #include "Esfera.h"
-// #include <algorithm>
 #include "Camera.h"
 #include "Luz.h"
 #include "Cena.h"
@@ -178,7 +176,9 @@ std::vector<Eigen::Vector3d> vertices = {
     Cena scene = Cena(ambient_light);
     //scene.add_object(malha);
     scene.add_object(sphere);
-/*     scene.add_object(plane);
+/*  scene.add_object(plane);
+    scene.add_object(plane);
+
     scene.add_object(plane2);
     scene.add_object(cilindro);
     scene.add_object(cone); */
@@ -212,11 +212,12 @@ std::vector<Eigen::Vector3d> vertices = {
                     case SDLK_o: camera.zoomIn(1.1); break; // zoom in
                     case SDLK_i: camera.zoomOut(1.1); break; // zoom out
 
-                  /*   case SDLK_f: malha->translacao(Eigen::Vector3d(1, 1, 1)); break;
-                    case SDLK_g: malha->rotacionar(45, Eigen::Vector3d(1, 1, 1)); break;
+
+                    case SDLK_f: malha->translacao(Eigen::Vector3d(1, 1, 1)); break;
+                    case SDLK_g: malha->rotacionar_quaternio(45, Eigen::Vector3d(1, 1, 1)); break;
                     case SDLK_h: malha->rotacionar_eixo('x', 30); break;
                     case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
-                    case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break; */
+                    case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break;
 
                     case SDLK_DELETE: {
                         // Procurar o objeto selecionado
@@ -235,26 +236,23 @@ std::vector<Eigen::Vector3d> vertices = {
                         }
                         break;
                     }
-                    
                 }
-                
+
                 camera.setPosition(camera_position);
-        
+
             }else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                
+
                 Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
                 // Raio gerado a partir do clique do mouse (ponto de origem e direção)
                 Raio raioCLique(camera.pos, dr);
-                
-                
                 auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
                 Eigen::Vector3d pontoAlvo = raioCLique.Po + t.t * raioCLique.dr;
 
                 // Atualiza a câmera para olhar para o ponto clicado
                 camera.lookAt(pontoAlvo, Eigen::Vector3d(0, 1, 0));
-        
+
                 // Re-renderizar cena
                 camera.draw_scene(renderer, scene);
                 if (forma_selecionada) {
