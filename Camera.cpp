@@ -142,3 +142,22 @@ void Camera::Viewport::updatePosition(const Eigen::Vector3d& newPos) {
     p00 = top_left + dx / 2 - dy / 2;
 
 }
+
+void Camera::zoomIn(double factor) {
+    // Reduzindo a distancia do viewport para dar zoom in
+    viewport.viewport_distance /= factor;
+
+    // Atualizando o viewport
+    viewport.updatePosition(pos);
+
+}
+
+void Camera::zoomOut(double factor) {
+    // Aumentando a distancia do viewport para zoom out
+    viewport.viewport_distance *= factor;
+
+    // Atualizando o viewport
+    viewport.updatePosition(pos);
+
+}
+
