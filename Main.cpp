@@ -134,7 +134,7 @@ std::vector<Triangulo> faces = {
     scene.add_object(malha);
     scene.add_object(sphere);
     scene.add_object(plane);
-    // scene.add_object(plane2);
+    scene.add_object(plane2);
     scene.add_object(cilindro);
     scene.add_object(cone);
     scene.add_light(light1);
@@ -176,20 +176,46 @@ std::vector<Triangulo> faces = {
                     case SDLK_h: malha->rotacionar_eixo('x', 30); break;
                     case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
                     case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break;
+
+                    case SDLK_DELETE: {
+                        // Procurar o objeto selecionado
+                        Forma* selecionado = nullptr;
+                        for (Forma* obj : scene.objects) {
+                            if (obj->isSelecioanda()) {
+                                selecionado = obj;
+                                break;
+                            }
+                        }
+                        // Se encontrou, remover e redesenhar
+                        if (selecionado) {
+                            if (scene.remove_object(selecionado)) {
+                                camera.draw_scene(renderer, scene);
+                            }
+                        }
+                        break;
+                    }
+
                 }
-                
+
                 camera.setPosition(camera_position);
-        
+
             }else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                
+
                 Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
                 // Raio gerado a partir do clique do mouse (ponto de origem e direção)
                 Raio raioCLique(camera.pos, dr);
-                
+
+
                 auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
-                
+                Eigen::Vector3d pontoAlvo = raioCLique.Po + t.t * raioCLique.dr;
+
+                // Atualiza a câmera para olhar para o ponto clicado
+                camera.lookAt(pontoAlvo, Eigen::Vector3d(0, 1, 0));
+
+                // Re-renderizar cena
+                camera.draw_scene(renderer, scene);
                 if (forma_selecionada) {
                     // Desmarcar todas as formas
                     for (Forma* obj : scene.objects) {
