@@ -136,7 +136,7 @@ std::vector<Triangulo> faces = {
     scene.add_object(malha);
     scene.add_object(sphere);
     scene.add_object(plane);
-    // scene.add_object(plane2);
+    scene.add_object(plane2);
     scene.add_object(cilindro);
     scene.add_object(cone);
     scene.add_light(light1);
@@ -196,6 +196,7 @@ std::vector<Triangulo> faces = {
                         }
                         break;
                     }
+                    
                 }
                 
                 camera.setPosition(camera_position);
@@ -208,8 +209,15 @@ std::vector<Triangulo> faces = {
                 // Raio gerado a partir do clique do mouse (ponto de origem e direção)
                 Raio raioCLique(camera.pos, dr);
                 
-                auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
                 
+                auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
+                Eigen::Vector3d pontoAlvo = raioCLique.Po + t.t * raioCLique.dr;
+
+                // Atualiza a câmera para olhar para o ponto clicado
+                camera.lookAt(pontoAlvo, Eigen::Vector3d(0, 1, 0));
+        
+                // Re-renderizar cena
+                camera.draw_scene(renderer, scene);
                 if (forma_selecionada) {
                     // Desmarcar todas as formas
                     for (Forma* obj : scene.objects) {

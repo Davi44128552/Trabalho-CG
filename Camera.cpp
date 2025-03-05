@@ -123,10 +123,15 @@ Camera::Viewport::Viewport(Eigen::Vector3d pos, double width, double height, dou
     this->rows = rows;
     this->viewport_distance = viewport_distance;
 
-    dx = Eigen::Vector3d(width / cols, 0.0, 0.0);
-    dy = Eigen::Vector3d(0.0, height / rows, 0.0);
-    top_left = Eigen::Vector3d(pos.x() - width / 2.0, pos.y() + height / 2.0, pos.z());
-    p00 = top_left + dx / 2 - dy / 2;
+    forward = Eigen::Vector3d(0, 0, -1);
+    right = Eigen::Vector3d(1, 0, 0);
+    up = Eigen::Vector3d(0, 1, 0);
+
+    dx = right * (width / cols);
+    dy = up * (height / rows);
+
+    top_left = pos - (right * (width / 2.0)) + (up * (height / 2.0));
+    p00 = top_left + dx * 0.5 - dy * 0.5;
 }
 
 void Camera::Viewport::updatePosition(const Eigen::Vector3d& newPos) {
@@ -141,6 +146,24 @@ void Camera::Viewport::updatePosition(const Eigen::Vector3d& newPos) {
     top_left = Eigen::Vector3d(pos.x() - width / 2.0, pos.y() + height / 2.0, pos.z());
     p00 = top_left + dx / 2 - dy / 2;
 
+}
+
+void Camera::lookAt(const Eigen::Vector3d& target, const Eigen::Vector3d& upVector) {
+    Eigen::Vector3d forward = (target - pos).normalized();
+    Eigen::Vector3d right = forward.cross(upVector).normalized();
+    Eigen::Vector3d up = right.cross(forward).normalized();
+
+    // Atualizar posição e orientação do viewport
+    viewport.pos = pos + forward * viewport.viewport_distance;
+    viewport.right = right;
+    viewport.up = up;
+    viewport.forward = forward;
+
+    // Recalcular dx, dy e pontos do viewport
+    viewport.dx = viewport.right * (viewport.width / viewport.cols);
+    viewport.dy = viewport.up * (viewport.height / viewport.rows);
+    viewport.top_left = viewport.pos - (viewport.right * (viewport.width / 2.0)) + (viewport.up * (viewport.height / 2.0));
+    viewport.p00 = viewport.top_left + viewport.dx * 0.5 - viewport.dy * 0.5;
 }
 
 void Camera::zoomIn(double factor) {
