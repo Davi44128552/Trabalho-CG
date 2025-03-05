@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/5c8f2f88-c64b-4d7b-9173-83f88bb93459)1. [ ] **Definição do cenário**
+1. [ ] **Definição do cenário**
     1. [ ] Coerência temática (Obrigatório)
 	    `O cenário tem de ter coerência temática, isto é, não pode ser um amontoado de objetos aleatoriamente distribuídos.`
 	2. [x] Coordenadas do mundo (Obrigatório)
