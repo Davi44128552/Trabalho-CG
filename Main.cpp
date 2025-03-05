@@ -3,10 +3,8 @@
 #include <Eigen/Dense>
 #include <SDL2/SDL.h>
 #include <iostream>
-// #include "Raio.h"
 #include "Cone.h"
 #include "Esfera.h"
-// #include <algorithm>
 #include "Camera.h"
 #include "Luz.h"
 #include "Cena.h"
@@ -174,7 +172,7 @@ std::vector<Triangulo> faces = {
                     case SDLK_i: camera.zoomOut(1.1); break; // zoom out
 
                     case SDLK_f: malha->translacao(Eigen::Vector3d(1, 1, 1)); break;
-                    case SDLK_g: malha->rotacionar(45, Eigen::Vector3d(1, 1, 1)); break;
+                    case SDLK_g: malha->rotacionar_quaternio(45, Eigen::Vector3d(1, 1, 1)); break;
                     case SDLK_h: malha->rotacionar_eixo('x', 30); break;
                     case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
                     case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break;
