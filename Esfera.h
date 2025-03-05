@@ -12,7 +12,12 @@ public:
     Esfera(Eigen::Vector3d centroEsfera, double raioEsfera, const Material& material);
     // Método para obter o ponto de interseção
     Intersecao obter_intersecao(const Raio& raio) const override;
-
+    std::pair<double, double> getTextureCoords(const Eigen::Vector3d& point) const override {
+        Eigen::Vector3d dir = (point - centroEsfera).normalized();
+        double u = 0.5 + atan2(dir.z(), dir.x()) / (2 * M_PI);
+        double v = 0.5 - asin(dir.y()) / M_PI;
+        return {u, v};
+    }
 private:
     // Atributos da esfera
     Eigen::Vector3d centroEsfera;

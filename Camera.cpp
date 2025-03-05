@@ -39,7 +39,14 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
             if (closest_intersect.existe && closest_intersect.t >= 0.0) {
                 Eigen::Vector3d p_intersect = r.Po + closest_intersect.t * r.dr;
                 Eigen::Vector3d ieye = Eigen::Vector3d::Zero();
-
+                Eigen::Vector3d kd_color;
+                if (closest_shape->getMaterial().hasTexture()) {
+                    auto [u, v] = closest_shape->getTextureCoords(p_intersect);
+                    kd_color = closest_shape->getMaterial().getTextureColor(u, v);
+                } else {
+                    kd_color = closest_shape->getMaterial().getKd();
+                }
+                auto [u, v] = closest_shape->getTextureCoords(p_intersect);
                 for (Luz light : scene.lights) {
                     bool na_sombra = false;
                     Raio raio_p_luz(p_intersect, light.posicao - p_intersect);
@@ -64,7 +71,7 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
                     if (rv < 0.0 || na_sombra) { rv = 0.0; }
 
                     Eigen::Vector3d iamb = closest_shape->getMaterial().getKa().cwiseProduct(scene.ambient_light);
-                    Eigen::Vector3d idif = closest_shape->getMaterial().getKd().cwiseProduct(light.cor) * nl;
+                    Eigen::Vector3d idif = kd_color.cwiseProduct(light.cor) * nl;
                     Eigen::Vector3d iesp = closest_shape->getMaterial().getKs().cwiseProduct(light.cor) * pow(rv, closest_shape->getMaterial().getShininess());
 
                     ieye += iamb + idif + iesp;
