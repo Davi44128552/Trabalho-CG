@@ -7,13 +7,16 @@
 #include "Raio.h"
 
 class Camera {
-    public:
+public:
     class Viewport {
     public:
         Eigen::Vector3d pos, dx, dy, top_left, p00;
         double width, height;
         double viewport_distance;
         int cols, rows;
+        Eigen::Vector3d right;
+        Eigen::Vector3d up;
+        Eigen::Vector3d forward;
 
         Viewport();
         Viewport(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance);
@@ -29,6 +32,8 @@ class Camera {
         this->pos = newPos;
         viewport.updatePosition(newPos);
     }
+    Eigen::Vector3d getPosition() const { return pos; }
+    void lookAt(const Eigen::Vector3d& target, const Eigen::Vector3d& upVector);
     Eigen::Vector3d getViewportPosition() const { return viewport.pos; }
     const Viewport& getViewport() const { return viewport; }
 
