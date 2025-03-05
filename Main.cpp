@@ -135,7 +135,7 @@ std::vector<Triangulo> faces = {
     Cena scene = Cena(ambient_light);
     scene.add_object(malha);
     scene.add_object(sphere);
-    // scene.add_object(plane);
+    scene.add_object(plane);
     // scene.add_object(plane2);
     scene.add_object(cilindro);
     scene.add_object(cone);
@@ -162,12 +162,22 @@ std::vector<Triangulo> faces = {
                 goto quit;
             } else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
-                    case SDLK_w: camera_position[2] -= 1; break; // Frente
-                    case SDLK_s: camera_position[2] += 1; break; // Trás
-                    case SDLK_a: camera_position[0] -= 1; break; // Esquerda
-                    case SDLK_d: camera_position[0] += 1; break; // Direita
-                    case SDLK_q: camera_position[1] += 1; break; // Cima
-                    case SDLK_e: camera_position[1] -= 1; break; // Baixo
+                    case SDLK_w: camera_position[2] -= 0.5; break; // Frente
+                    case SDLK_s: camera_position[2] += 0.5; break; // Trás
+                    case SDLK_a: camera_position[0] -= 0.5; break; // Esquerda
+                    case SDLK_d: camera_position[0] += 0.5; break; // Direita
+                    case SDLK_q: camera_position[1] += 0.5; break; // Cima
+                    case SDLK_e: camera_position[1] -= 0.5; break; // Baixo
+
+                    // Funcao para aplicar zoom in e zoom out, conforte e requisitado
+                    case SDLK_o: camera.zoomIn(1.1); break; // zoom in
+                    case SDLK_i: camera.zoomOut(1.1); break; // zoom out
+
+                    case SDLK_f: malha->translacao(Eigen::Vector3d(1, 1, 1)); break;
+                    case SDLK_g: malha->rotacionar(45, Eigen::Vector3d(1, 1, 1)); break;
+                    case SDLK_h: malha->rotacionar_eixo('x', 30); break;
+                    case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
+                    case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break;
                 }
                 
                 camera.setPosition(camera_position);
@@ -175,8 +185,6 @@ std::vector<Triangulo> faces = {
             }else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                
-
                 
                 Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
                 // Raio gerado a partir do clique do mouse (ponto de origem e direção)
@@ -196,6 +204,7 @@ std::vector<Triangulo> faces = {
                     // Re-renderizar cena
                     camera.draw_scene(renderer, scene);
                 }
+
             }}
         // draw scene
         camera.draw_scene(renderer, scene);
