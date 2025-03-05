@@ -14,7 +14,7 @@
 		1. [x] Translação (Obrigatório)
 		2. [x] Rotação (Obrigatório)
 			1. [x] Em torno de um dos eixos x, y ou z (Obrigatório)
-			2. [ ] Em torno de um eixo arbitrário (Quatérnios/mudança de sist. de coord.)
+			2. [x] Em torno de um eixo arbitrário (Quatérnios)
 		3. [x] Escala (Obrigatório)
 		4. [x] Cisalhamento (+ 0.5)
 		5. [ ] Espelho em relação a um plano arbitrário (+ 0.5)
