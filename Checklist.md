@@ -9,7 +9,7 @@
 		3. [x] Cone
 		4. [x] Malha
 	4. [x] Materiais (pelo menos quatro materiais distintos) (Obrigatório)
-	5. [ ] Textura (pelo menos uma textura aplicada) (Obrigatório)
+	5. [x] Textura (pelo menos uma textura aplicada) (Obrigatório)
 	6. [x] Transformações
 		1. [x] Translação (Obrigatório)
 		2. [x] Rotação (Obrigatório)
