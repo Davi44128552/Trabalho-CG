@@ -39,3 +39,13 @@ Intersecao Esfera::obter_intersecao(const Raio& raio) const{
     }
 
 }
+
+// Implementando a funcao para realizar translacao
+void Esfera::translacao(Eigen::Vector3d d){
+  centroEsfera = centroEsfera + d;
+}
+
+// Implementando a funcao para "escalonar"
+void Esfera::escalonar(double d){
+    raioEsfera = raioEsfera * d;
+}

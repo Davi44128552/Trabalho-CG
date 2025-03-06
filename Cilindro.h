@@ -17,6 +17,15 @@ public:
 	// Metodo para verificar se ocorre intersecao entre o raio e o cilindro
 	Intersecao obter_intersecao(const Raio& raio) const override;
 
+    // Metodo para obter centroide
+	Eigen::Vector3d calcularCentroide() const;
+
+    // Funcoes das transformacoes
+    void translacao(Eigen::Vector3d d);
+    void escalonar(double d);
+    void rotacionar_eixo(char eixo, double angulo);
+	void rotacionar_quaternio(double angulo, Eigen::Vector3d eixo);
+
 private:
 	// Atributos do cilindro
 	double altura; // Altura do cilindro

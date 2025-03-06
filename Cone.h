@@ -17,6 +17,15 @@ public:
 	// Metodo para verificar se ocorre intersecao entre o raio e o Cone
 	Intersecao obter_intersecao(const Raio& raio) const override;
 
+    // Metodo para calcular o centroide de um cone
+	Eigen::Vector3d calcularCentroide() const;
+
+    // Funcoes de transformacoes
+    void translacao(Eigen::Vector3d d);
+    void escalonar(double d);
+    void rotacionar_eixo(char eixo, double angulo);
+    void rotacionar_quaternio(double angulo, Eigen::Vector3d eixo);
+
 private:
 	// Atributos do Cone
 	double altura; // Altura do Cone

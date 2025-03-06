@@ -13,6 +13,10 @@ public:
     // Método para obter o ponto de interseção
     Intersecao obter_intersecao(const Raio& raio) const override;
 
+    // Funcoes para transformacoes (cabiveis a este objeto)
+    void translacao(Eigen::Vector3d d);
+    void escalonar(double d);
+
 private:
     // Atributos da esfera
     Eigen::Vector3d centroEsfera;

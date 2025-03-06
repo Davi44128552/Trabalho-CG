@@ -71,3 +71,89 @@ Intersecao Cone::obter_intersecao(const Raio& raio) const {
 
     return Intersecao::NONE;
 }
+
+// Implementando funcao para calcular o centroide de um cone
+Eigen::Vector3d Cone::calcularCentroide() const {
+    Eigen::Vector3d vertice = centro_base + dc * altura; // Calculando o vertice do triangulo ("centro topo" do cone)
+    Eigen::Vector3d centroide = centro_base + (vertice - centro_base) * (1.0 / 4.0); // Calculando o centroide
+    return centroide;
+}
+
+// Implementando funcao de translacao
+void Cone::translacao(Eigen::Vector3d d) {
+  centro_base = centro_base + d;
+}
+
+// Implementando a funcao de escalonamento
+void Cone::escalonar(double d) {
+  altura = altura * d;
+  raio_base = raio_base * d;
+}
+
+// Implementando a funcao para rotacionar em torno de um eixo(x, y ou z)
+void Cone::rotacionar_eixo(char eixo, double angulo) {
+
+  // Calculando o centroide e realizando translacao
+  Eigen::Vector3d centroide = calcularCentroide();
+  translacao(-centroide);
+
+  // Definindo a matriz
+  Eigen::Matrix3d K;
+
+  // Convertendo o angulo para radianos
+  double anguloRad = angulo * M_PI / 180.0;
+
+  // Verificando em torno de qual eixo sera rotacionado
+  if (eixo == 'x'){
+    K <<    1, 0, 0,
+            0, cos(anguloRad), -sin(anguloRad),
+            0, sin(anguloRad), cos(anguloRad);
+  }
+
+  else if (eixo == 'y'){
+    K <<    cos(anguloRad), 0, sin(anguloRad),
+            0, 1, 0,
+            -sin(anguloRad), 0, cos(anguloRad);
+  }
+
+  else if (eixo == 'z'){
+    K <<    cos(anguloRad), -sin(anguloRad), 0,
+            sin(anguloRad), cos(anguloRad), 0,
+            0, 0, 1;
+  }
+
+  else{
+    return; // Para casos invalidos
+  }
+
+  // Reposicionando pontos e a diracao do cilindro de acordo com as matrizes
+  dc = K * dc;
+  centro_base = K * centro_base;
+
+  translacao(centroide);
+
+}
+
+// Implementando funcao de rotacao usando quaternios
+void Cone::rotacionar_quaternio(double angulo, Eigen::Vector3d eixo) {
+  	// Realizando a translacao com o centroide
+    Eigen::Vector3d centroide = calcularCentroide();
+    translacao(-centroide);
+
+	// Convertendo o angulo de graus para radianos
+	double anguloRad = angulo * M_PI / 180.0;
+
+	// Normalizando o eixo de rotacao
+	eixo.normalize();
+
+	// Criando o quatérnio de rotação
+	Eigen::Quaterniond q;
+	q = Eigen::AngleAxisd(anguloRad, eixo);
+
+	// Aplicando a rotacao ao centro da base e a dc
+    centro_base = q * centro_base;
+    dc = q * dc;
+
+    // Realizando outra translacao para trazer o cilindro de volta ao seu lugar
+    translacao(centroide);
+}
