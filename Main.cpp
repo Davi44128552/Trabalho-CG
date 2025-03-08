@@ -215,12 +215,12 @@ int main() {
                 goto quit;
             } else if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
-                    case SDLK_w: camera_position[2] -= 0.5; break; // Frente
-                    case SDLK_s: camera_position[2] += 0.5; break; // Trás
-                    case SDLK_a: camera_position[0] -= 0.5; break; // Esquerda
-                    case SDLK_d: camera_position[0] += 0.5; break; // Direita
-                    case SDLK_q: camera_position[1] += 0.5; break; // Cima
-                    case SDLK_e: camera_position[1] -= 0.5; break; // Baixo
+                    case SDLK_w: camera_position[2] -= 0.5; camera.setPosition(camera_position);break; // Frente
+                    case SDLK_s: camera_position[2] += 0.5; camera.setPosition(camera_position);break; // Trás
+                    case SDLK_a: camera_position[0] -= 0.5; camera.setPosition(camera_position);break; // Esquerda
+                    case SDLK_d: camera_position[0] += 0.5; camera.setPosition(camera_position);break; // Direita
+                    case SDLK_q: camera_position[1] += 0.5; camera.setPosition(camera_position);break; // Cima
+                    case SDLK_e: camera_position[1] -= 0.5; camera.setPosition(camera_position);break; // Baixo
 
                     // Funcao para aplicar zoom in e zoom out, conforte e requisitado
                     case SDLK_o: camera.zoomIn(1.1); break; // zoom in
@@ -231,6 +231,24 @@ int main() {
                     case SDLK_h: malha->rotacionar_eixo('x', 30); break;
                     case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
                     case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break; 
+
+                    //  rotação da câmera
+                    case SDLK_m: // Rotacionar para a esquerda 
+                        camera.rotateYaw(5.0);
+                        camera.draw_scene(renderer, scene);
+                    break;
+                    case SDLK_n: // Rotacionar para a direita 
+                        camera.rotateYaw(-5.0);
+                        camera.draw_scene(renderer, scene);
+                    break;
+                    case SDLK_v: // Rotacionar para cima 
+                        camera.rotatePitch(5.0);
+                        camera.draw_scene(renderer, scene);
+                    break;
+                    case SDLK_b: // Rotacionar para baixo 
+                        camera.rotatePitch(-5.0);
+                        camera.draw_scene(renderer, scene);
+                    break;
 
                     case SDLK_DELETE: {
                         // Procurar o objeto selecionado
@@ -251,7 +269,7 @@ int main() {
                     }
                 }
 
-                camera.setPosition(camera_position);
+                //camera.setPosition(camera_position);
 
             }else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX = event.button.x;

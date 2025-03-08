@@ -21,6 +21,7 @@ public:
         Viewport();
         Viewport(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance);
         void updatePosition(const Eigen::Vector3d& newPos);
+        void updateOrientation();
     };
     Eigen::Vector3d pos, bg_color;
 
@@ -30,7 +31,9 @@ public:
     void draw_scene(SDL_Renderer* renderer, Cena scene);
     void setPosition(const Eigen::Vector3d& newPos) {
         this->pos = newPos;
-        viewport.updatePosition(newPos);
+            
+        viewport.pos = pos + viewport.forward * viewport.viewport_distance;
+        viewport.updateOrientation();
     }
     Eigen::Vector3d getPosition() const { return pos; }
     void lookAt(const Eigen::Vector3d& target, const Eigen::Vector3d& upVector);
@@ -40,6 +43,8 @@ public:
     // Funcoes para realizar zoom in e zoom out
     void zoomIn(double factor);
     void zoomOut(double factor);
+    void rotateYaw(double degrees);
+    void rotatePitch(double degrees);
 
 
 private:
@@ -47,6 +52,7 @@ private:
     Viewport viewport;
 
     inline void draw_pixel(SDL_Renderer* renderer, int x, int y, Eigen::Vector3d color);
+    Eigen::Vector3d rotatePointAroundCamera(const Eigen::Vector3d& target, const Eigen::Vector3d& axis, double degrees);
 };
 
 #endif // CAMERA_H
