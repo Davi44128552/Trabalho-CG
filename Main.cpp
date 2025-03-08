@@ -187,12 +187,12 @@ int main() {
     double camera_speed = 1;
 
     Cena scene = Cena(ambient_light);
-    //scene.add_object(malha);
+    scene.add_object(malha);
     scene.add_object(sphere);
     scene.add_object(plane);
     scene.add_object(plane2);
     scene.add_object(cilindro);
-    //scene.add_object(cone); 
+    scene.add_object(cone); 
     scene.add_light(light1);
     //scene.add_light(light2);
     scene.add_object(sphere2);
@@ -224,7 +224,7 @@ int main() {
                     case SDLK_i: camera.zoomOut(1.1); break; // zoom out
 
                     case SDLK_f: malha->translacao(Eigen::Vector3d(1, 1, 1)); break;
-                    case SDLK_g: malha->rotacionar(45, Eigen::Vector3d(1, 1, 1)); break;
+                    case SDLK_g: malha->rotacionar_quaternio(45, Eigen::Vector3d(1, 1, 1)); break;
                     case SDLK_h: malha->rotacionar_eixo('x', 30); break;
                     case SDLK_j: malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1)); break;
                     case SDLK_k: malha->cisalhar(0, 1, 0, 0, 0, 0); break; 
