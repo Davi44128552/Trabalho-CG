@@ -35,12 +35,11 @@ void Malha::translacao(Eigen::Vector3d d){
   }
 }
 
-void Malha::rotacionar(double angulo, Eigen::Vector3d eixo){
+void Malha::rotacionar_quaternio(double angulo, Eigen::Vector3d eixo){
   Eigen::Vector3d centroide = calcularCentroide();
   translacao(-centroide);
   for (Triangulo& face : faces) {
-    Eigen::Vector3d centroide = (face.vertice1 + face.vertice2 + face.vertice3) / 3.0;
-    face.rotacionar(angulo, eixo);
+    face.rotacionar_quaternio(angulo, eixo);
   }
   translacao(centroide);
 }

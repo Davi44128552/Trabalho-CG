@@ -1,4 +1,5 @@
 # include "Triangulo.h"
+#include <Eigen/Geometry> // Para usar quatérnios do Eigen
 
 // Implementando o construtor
 Triangulo::Triangulo(Eigen::Vector3d vertice1, Eigen::Vector3d vertice2, Eigen::Vector3d vertice3)
@@ -67,33 +68,25 @@ void Triangulo::translacao(Eigen::Vector3d d){
 }
 
 // Implementando a funcao para realizar a rotacao
-void Triangulo::rotacionar(double angulo, Eigen::Vector3d eixo) {
-    // Convertendo o ângulo de graus para radianos
-    double anguloRad = angulo * M_PI / 180.0;
+void Triangulo::rotacionar_quaternio(double angulo, Eigen::Vector3d eixo) {
+	// Convertendo o ângulo de graus para radianos
+	double anguloRad = angulo * M_PI / 180.0;
 
-    // Normalizando o eixo de rotacao
-    eixo.normalize();
+	// Normalizando o eixo de rotação
+	eixo.normalize();
 
-    // Calculando o centroide do triangulo
-    Eigen::Vector3d centroide = (vertice1 + vertice2 + vertice3) / 3.0;
+	// Criando o quatérnio de rotação
+	Eigen::Quaterniond q;
+	q = Eigen::AngleAxisd(anguloRad, eixo);
 
-    // Criando a matriz de rotacao usando a formula de Rodrigues
-    Eigen::Matrix3d K;
-    K <<    0, -eixo.z(), eixo.y(),
-            eixo.z(), 0, -eixo.x(),
-            -eixo.y(), eixo.x(), 0;
+	// Aplicando a rotação aos vértices
+	vertice1 = q * vertice1;
+	vertice2 = q * vertice2;
+	vertice3 = q * vertice3;
 
-    Eigen::Matrix3d R = Eigen::Matrix3d::Identity() + sin(anguloRad) * K + (1 - cos(anguloRad)) * (K * K);
-
-    // Aplicando a rotacao aos vertices
-    vertice1 = R * vertice1;
-    vertice2 = R * vertice2;
-    vertice3 = R * vertice3;
-
-    // Atualizando a normal do triângulo
-    normal = obter_normal();
+	// Atualizando a normal do triângulo
+	normal = obter_normal();
 }
-
 void Triangulo::rotacionar_eixo(char eixo, double angulo){
 
   // Definindo a matriz

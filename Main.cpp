@@ -4,10 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
-// #include "Raio.h"
 #include "Cone.h"
 #include "Esfera.h"
-// #include <algorithm>
 #include "Camera.h"
 #include "Luz.h"
 #include "Cena.h"
@@ -248,26 +246,23 @@ int main() {
                         }
                         break;
                     }
-                    
                 }
-                
+
                 camera.setPosition(camera_position);
-        
+
             }else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                
+
                 Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
                 // Raio gerado a partir do clique do mouse (ponto de origem e direção)
                 Raio raioCLique(camera.pos, dr);
-                
-                
                 auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
                 Eigen::Vector3d pontoAlvo = raioCLique.Po + t.t * raioCLique.dr;
 
                 // Atualiza a câmera para olhar para o ponto clicado
                 camera.lookAt(pontoAlvo, Eigen::Vector3d(0, 1, 0));
-        
+
                 // Re-renderizar cena
                 camera.draw_scene(renderer, scene);
                 if (forma_selecionada) {
