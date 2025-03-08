@@ -12,7 +12,7 @@ public:
     Texture(const std::vector<uint8_t>& textureData, uint32_t width, uint32_t height, uint32_t pitch, uint32_t bpp)
         : textureData(textureData), width(width), height(height), pitch(pitch), bpp(bpp) {}
 
-    // Método para criar uma textura a partir de uma superfície (equivalente ao `new` em Rust)
+    // Método para criar uma textura a partir de uma superfície 
     static Texture fromSurface(const std::vector<uint8_t>& surfaceData, uint32_t width, uint32_t height, uint32_t pitch) {
         uint32_t bpp = pitch / width; // Bytes por pixel
         return Texture(surfaceData, width, height, pitch, bpp);

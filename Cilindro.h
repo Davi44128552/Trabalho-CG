@@ -16,6 +16,7 @@ public:
 
 	// Metodo para verificar se ocorre intersecao entre o raio e o cilindro
 	Intersecao obter_intersecao(const Raio& raio) const override;
+	std::pair<double, double> getTextureCoords(const Eigen::Vector3d& point) const override;
 
 private:
 	// Atributos do cilindro

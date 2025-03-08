@@ -1,10 +1,37 @@
 # include "Plano.h"
 #include "Intersecao.h"
-
+#include "cmath"
 // Implementando o construtor
 Plano::Plano(Eigen::Vector3d ponto_plano, Eigen::Vector3d normal, const Material& material)
-	: Forma(material), ponto_plano(ponto_plano), normal(normal.normalized()) {}
+	: Forma(material), ponto_plano(ponto_plano), normal(normal.normalized()) {
+		Eigen::Vector3d v(0.0, 1.0, 0.0);
+		tangente = this->normal.cross(v);
+		if(tangente.squaredNorm() < 1e-6){
+			v = Eigen::Vector3d(0.0, 0.0, 1.0);
+			tangente = this->normal.cross(v);
+		}
+		tangente.normalize();
+		bitangente = this->normal.cross(tangente).normalized();
+	}
 
+std::pair<double, double> Plano::getTextureCoords(const Eigen::Vector3d& point) const {
+	// Vetor do ponto de referência do plano até o ponto de interseção
+	Eigen::Vector3d vec = point - ponto_plano;
+	
+	// Projetar nos vetores tangente e bitangente
+	double u = vec.dot(tangente);
+	double v = vec.dot(bitangente);
+	
+	// Aplicar repetição da textura (wrap around)
+	u = std::fmod(u, 1.0);
+	v = std::fmod(v, 1.0);
+	
+	// Garantir valores positivos
+	if (u < 0.0) u += 1.0;
+	if (v < 0.0) v += 1.0;
+	
+	return {u, v};
+}
 // Implementando a funcao que verifica se o raio intercepta o plano
 Intersecao Plano::obter_intersecao(const Raio& raio) const{
 

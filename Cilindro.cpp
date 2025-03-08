@@ -90,3 +90,31 @@ Intersecao Cilindro::obter_intersecao(const Raio& raio) const {
     
     return Intersecao::NONE;
 }
+std::pair<double, double> Cilindro::getTextureCoords(const Eigen::Vector3d& point) const {
+    // Vetor do centro da base até o ponto de interseção
+    Eigen::Vector3d to_center = point - centro_base;
+    
+    // Altura ao longo do eixo do cilindro
+    double h = to_center.dot(dc);
+    
+    // Componente radial (ortogonal ao eixo dc)
+    Eigen::Vector3d radial_vec = to_center - h * dc;
+
+    // Caso o ponto esteja exatamente no eixo (radial_vec muito pequeno)
+    if (radial_vec.squaredNorm() < 1e-9) {
+        return {0.5, h / altura}; // Centro da textura em u
+    }
+
+    // Encontra vetores ortogonais no plano perpendicular a dc
+    Eigen::Vector3d u = dc.unitOrthogonal(); // Vetor perpendicular a dc
+    Eigen::Vector3d v = dc.cross(u).normalized();
+
+    // Calcula o ângulo theta em torno do eixo
+    double theta = atan2(radial_vec.dot(v), radial_vec.dot(u));
+
+    // Mapeia theta para [0, 1] e a altura para v
+    double u_coord = (theta + M_PI) / (2 * M_PI);
+    double v_coord = h / altura;
+
+    return {u_coord, v_coord};
+}
