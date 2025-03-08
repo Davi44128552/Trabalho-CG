@@ -205,6 +205,9 @@ int main() {
     // main loop
     SDL_Event event;
     camera.draw_scene(renderer, scene);
+    for (Forma* obj : scene.objects) {
+        obj->setSelecionada(false);
+    }
     while (true) {
         // event handler
         while (SDL_PollEvent(&event) != 0) {
@@ -254,26 +257,36 @@ int main() {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
 
+                // verfica se o shift ou ctrl estão pressionados 
+                bool shiftPressed = (SDL_GetModState() & KMOD_SHIFT) != 0;
+                bool ctrlPressed = (SDL_GetModState() & KMOD_CTRL) != 0;
+
                 Eigen::Vector3d dr = ((camera.getViewport().p00 + camera.getViewport().dx * mouseX - camera.getViewport().dy * mouseY) - camera.pos).normalized();
                 // Raio gerado a partir do clique do mouse (ponto de origem e direção)
                 Raio raioCLique(camera.pos, dr);
-                auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
-                Eigen::Vector3d pontoAlvo = raioCLique.Po + t.t * raioCLique.dr;
-
-                // Atualiza a câmera para olhar para o ponto clicado
-                camera.lookAt(pontoAlvo, Eigen::Vector3d(0, 1, 0));
-
-                // Re-renderizar cena
-                camera.draw_scene(renderer, scene);
-                if (forma_selecionada) {
-                    // Desmarcar todas as formas
-                    for (Forma* obj : scene.objects) {
-                        obj->setSelecionada(false);
+                if(shiftPressed){
+                    auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
+                    Eigen::Vector3d pontoAlvo = raioCLique.Po + t.t * raioCLique.dr;
+                    if (forma_selecionada) {                    
+                        // Verifica se o objeto já está selecionado
+                        if (forma_selecionada->isSelecioanda()) {
+                            // Se já estiver selecionado, desmarque-o
+                            forma_selecionada->setSelecionada(false);
+                        } else {
+                            // Caso contrário, marque-o como selecionado
+                            forma_selecionada->setSelecionada(true);
+                        }
+                       
+                        // Re-renderizar cena
+                        camera.draw_scene(renderer, scene);
                     }
-                    
-                    // Marcar forma clicada
-                    forma_selecionada->setSelecionada(true);
-                   
+                }
+                if(ctrlPressed){
+                    auto [forma_selecionada, t] = scene.get_closest_object(raioCLique);
+                    Eigen::Vector3d pontoAlvo = raioCLique.Po + t.t * raioCLique.dr;
+                    // Atualiza a câmera para olhar para o ponto clicado
+                    camera.lookAt(pontoAlvo, Eigen::Vector3d(0, 1, 0));
+
                     // Re-renderizar cena
                     camera.draw_scene(renderer, scene);
                 }
