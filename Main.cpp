@@ -30,12 +30,12 @@ using namespace Eigen;
 using namespace std;
 
 int main() {
-    Vector3d p0(0,0,10);
-
+    Vector3d p0(5,1,5);
+    
     double aspect_ratio = 16.0/9.0;
-    double viewport_width = 3.2;
+    double viewport_width = 0.25;
     double viewport_height = viewport_width/aspect_ratio;
-    double viewport_distance = 5.0;
+    double viewport_distance = 0.25;
     int image_width = 960;
     int image_height = image_width/aspect_ratio;
 
@@ -45,7 +45,7 @@ int main() {
     if (window == NULL) { printf("SDL_CreateWindow Error: %s\n", SDL_GetError()); SDL_Quit(); return 1; }
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL) { printf("SDL_CreateRenderer Error: %s\n", SDL_GetError()); SDL_DestroyWindow(window); SDL_Quit(); return 1; }
-        // Inicialize a SDL_image (para carregar PNG)
+    // para carregar PNG
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
         std::cerr << "Erro ao inicializar SDL_image: " << IMG_GetError() << std::endl;
         SDL_Quit();
@@ -58,6 +58,9 @@ int main() {
     Texture* texturaPlastico = TextureLoader::loadTexture("textura_plastico.jpg");
     Texture* texturaTijolo = TextureLoader::loadTexture("textura_blocos.jpg");
     Texture* texturaMetal = TextureLoader::loadTexture("textura_metal.jpg");
+    Texture* texturaTijoloBranco = TextureLoader::loadTexture("textura_tijolo_branco.jpg");
+    Texture* texturaMadeiraWall = TextureLoader::loadTexture("textura_wall.jpg");
+    Texture* texturaPiso = TextureLoader::loadTexture("textura_piso.jpg");
 
     Material mat_madeira(
         Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
@@ -84,13 +87,21 @@ int main() {
     );
 
     Material mat_tijolo(
-        Vector3d(0.3, 0.2, 0.1),   // ka (tijolo reflete pouco a luz ambiente)
-        Vector3d(0.7, 0.4, 0.3),   // kd (bastante difuso, já que tijolos não refletem muito)
+        Vector3d(0, 0, 0),   // ka (tijolo reflete pouco a luz ambiente)
+        Vector3d(1, 1, 1),   // kd (bastante difuso, já que tijolos não refletem muito)
         Vector3d(0.1, 0.1, 0.1),   // ks (quase sem brilho, textura rugosa)
-        5,                         // shininess (superfície muito áspera)
+        1,                         // shininess (superfície muito áspera)
         texturaTijolo
     );
 
+    Material mat_tijolo_branco(
+        Vector3d(0, 0, 0),   // ka (tijolo reflete pouco a luz ambiente)
+        Vector3d(1, 1, 1),   // kd (bastante difuso, já que tijolos não refletem muito)
+        Vector3d(0.1, 0.1, 0.1),   // ks (quase sem brilho, textura rugosa)
+        5,                       // shininess (superfície muito áspera)
+        texturaTijoloBranco
+    );
+    
     Material mat_metal(
         Vector3d(0.4, 0.4, 0.4),   // ka (reflete bastante luz ambiente)
         Vector3d(0.8, 0.8, 0.8),   // kd (superfície bem reflexiva)
@@ -98,7 +109,21 @@ int main() {
         100,                       // shininess (metal polido tem brilho muito alto)
         texturaMetal
     );
+    Material mat_wall_madeira(
+        Vector3d(0, 0, 0),   // ka (tijolo reflete pouco a luz ambiente)
+        Vector3d(1, 1, 1),   // kd (bastante difuso, já que tijolos não refletem muito)
+        Vector3d(0.1, 0.1, 0.1),   // ks (quase sem brilho, textura rugosa)
+        10,                        // shininess (superfície áspera, brilho baixo)
+        texturaMadeiraWall
+    );
 
+    Material mat_piso(
+        Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
+        Vector3d(0.6, 0.4, 0.2),   // kd (boa difusão da luz, textura amadeirada)
+        Vector3d(0.3, 0.2, 0.1),   // ks (brilho baixo, já que madeira não reflete muito)
+        10,                        // shininess (superfície áspera, brilho baixo)
+        texturaPiso
+    );
     double sphere_radius = 0.5;
     Vector3d sphere_center(0,-0.5,0);
 
@@ -108,6 +133,26 @@ int main() {
     Vector3d plane2_p0( 0.0, 0.0, -6.0);
     Vector3d plane2_normal(0.0, 0.0, 1.0);
     Vector3d bg_color(0.0, 0.0, 0.0);
+
+    Vector3d p0_plano_tras( 0.0, 0.0, 10.0);
+    Vector3d normal_tras(0.0, 0.0, -1.0);
+    Vector3d p0_plano_frente(0.0, 0.0, 0.0);
+    Vector3d normal_frente(0.0, 0.0, 1.0);
+    Vector3d p0_plano_esquerda(0.0, 0.0, 0.0);
+    Vector3d normal_esquerda(1.0, 0.0, 0.0);
+    Vector3d p0_plano_direita(10.0, 0.0, 0.0);
+    Vector3d normal_direita(-1.0, 0.0, 0.0);
+    Vector3d p0_plano_chao(0.0, 0.0, 0.0);
+    Vector3d normal_chao(0.0, 1.0, 0.0);
+    Vector3d p0_plano_teto(0.0, 2.0, 0.0);
+    Vector3d normal_teto(0.0, -1.0, 0.0);
+
+    Plano* plano_tras = new Plano(p0_plano_tras, normal_tras, mat_wall_madeira);
+    Plano* plano_frente = new Plano(p0_plano_frente, normal_frente, mat_wall_madeira);
+    Plano* plano_esquerda = new Plano(p0_plano_esquerda, normal_esquerda, mat_wall_madeira);
+    Plano* plano_direita = new Plano(p0_plano_direita, normal_direita, mat_wall_madeira);
+    Plano* plano_chao = new Plano(p0_plano_chao, normal_chao, mat_piso);
+    Plano* plano_teto = new Plano(p0_plano_teto, normal_teto, mat_marmore);
 
     Material formas = Material(
         Vector3d(0.7, 0.2, 0.2),
@@ -164,7 +209,8 @@ int main() {
 
     Plano* plane = new Plano(plane_p0, plane_normal, mat_tijolo);
     Plano* plane2 = new Plano(plane2_p0, plane2_normal, mat_marmore);
-
+    
+     
     Vector3d cylinder_base_center(1.375, 12.0, -(viewport_distance + 2.0 / 2.0));  // Posição do cilindro ao lado da esfera
     Vector3d cylinder_direction(1.0, 0.0, 0.0);
     Cilindro* cilindro = new Cilindro (2.5, 0.2, cylinder_direction, cylinder_base_center, mat_madeira);
@@ -175,9 +221,9 @@ int main() {
 
 
     Luz light1 = Luz(
-        Vector3d(0.0, 20.0, 100.0),
+        Vector3d(5,1,5),
         Vector3d(1.0, 1.0, 1.0),
-        0.6
+        0.2
     );
 /*     Luz light2 = Luz(
         Vector3d(0.0, 7000.0, 110000.0),
@@ -193,17 +239,23 @@ int main() {
     double camera_speed = 1;
 
     Cena scene = Cena(ambient_light);
-    scene.add_object(malha);
+    //scene.add_object(malha);
     //scene.add_object(sphere);
     //scene.add_object(plane);
     //scene.add_object(plane2);
-    scene.add_object(cilindro);
-    scene.add_object(cone);
+    //scene.add_object(cilindro);
+    //scene.add_object(cone); 
     scene.add_light(light1);
     //scene.add_light(light2);
-    scene.add_object(sphere2);
+    //scene.add_object(sphere2);
     //scene.add_object(sphere3);
     //scene.add_object(sphere4);
+    scene.add_object(plano_tras);
+    scene.add_object(plano_frente);
+    scene.add_object(plano_esquerda);
+    scene.add_object(plano_direita);
+    scene.add_object(plano_chao);
+    scene.add_object(plano_teto);
 
     // contador de fps
     int frameCount = 0;
@@ -232,7 +284,7 @@ int main() {
 
     // main loop
     SDL_Event event;
-    camera.draw_scene(renderer, scene);
+    //camera.draw_scene(renderer, scene);
     for (Forma* obj : scene.objects) {
         obj->setSelecionada(false);
     }
