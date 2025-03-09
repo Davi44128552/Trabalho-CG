@@ -18,7 +18,7 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
     SDL_RenderClear(renderer);
 
     // Número de threads disponíveis
-    unsigned int num_threads = std::thread::hardware_concurrency() * 3; // Usar 3x o número de threads disponíveis
+    unsigned int num_threads = std::thread::hardware_concurrency() * 1; // Usar 3x o número de threads disponíveis
     std::vector<std::thread> threads;
 
     // Número total de pixels
@@ -39,7 +39,14 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
             if (closest_intersect.existe && closest_intersect.t >= 0.0) {
                 Eigen::Vector3d p_intersect = r.Po + closest_intersect.t * r.dr;
                 Eigen::Vector3d ieye = Eigen::Vector3d::Zero();
-
+                Eigen::Vector3d kd_color;
+                if (closest_shape->getMaterial().hasTexture()) {
+                    auto [u, v] = closest_shape->getTextureCoords(p_intersect);
+                    kd_color = closest_shape->getMaterial().getTextureColor(u, v);
+                } else {
+                    kd_color = closest_shape->getMaterial().getKd();
+                }
+                auto [u, v] = closest_shape->getTextureCoords(p_intersect);
                 for (Luz light : scene.lights) {
                     bool na_sombra = false;
                     Raio raio_p_luz(p_intersect, light.posicao - p_intersect);
@@ -64,7 +71,7 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
                     if (rv < 0.0 || na_sombra) { rv = 0.0; }
 
                     Eigen::Vector3d iamb = closest_shape->getMaterial().getKa().cwiseProduct(scene.ambient_light);
-                    Eigen::Vector3d idif = closest_shape->getMaterial().getKd().cwiseProduct(light.cor) * nl;
+                    Eigen::Vector3d idif = kd_color.cwiseProduct(light.cor) * nl;
                     Eigen::Vector3d iesp = closest_shape->getMaterial().getKs().cwiseProduct(light.cor) * pow(rv, closest_shape->getMaterial().getShininess());
 
                     ieye += iamb + idif + iesp;
@@ -133,6 +140,12 @@ Camera::Viewport::Viewport(Eigen::Vector3d pos, double width, double height, dou
     top_left = pos - (right * (width / 2.0)) + (up * (height / 2.0));
     p00 = top_left + dx * 0.5 - dy * 0.5;
 }
+void Camera::Viewport::updateOrientation() {
+    dx = right * (width / cols);
+    dy = up * (height / rows);
+    top_left = pos - (right * (width / 2.0)) + (up * (height / 2.0));
+    p00 = top_left + dx * 0.5 - dy * 0.5;
+}
 
 void Camera::Viewport::updatePosition(const Eigen::Vector3d& newPos) {
     // Atualiza a posição do viewport
@@ -164,6 +177,8 @@ void Camera::lookAt(const Eigen::Vector3d& target, const Eigen::Vector3d& upVect
     viewport.dy = viewport.up * (viewport.height / viewport.rows);
     viewport.top_left = viewport.pos - (viewport.right * (viewport.width / 2.0)) + (viewport.up * (viewport.height / 2.0));
     viewport.p00 = viewport.top_left + viewport.dx * 0.5 - viewport.dy * 0.5;
+    viewport.pos = pos + viewport.forward * viewport.viewport_distance;
+    viewport.updateOrientation();
 }
 
 void Camera::zoomIn(double factor) {
@@ -183,4 +198,22 @@ void Camera::zoomOut(double factor) {
     viewport.updatePosition(pos);
 
 }
+Eigen::Vector3d Camera::rotatePointAroundCamera(const Eigen::Vector3d& target, const Eigen::Vector3d& axis, double degrees) {
+    Eigen::Vector3d translatedTarget = target - pos;
+    Eigen::AngleAxisd rotation(degrees * M_PI / 180.0, axis.normalized());
+    Eigen::Vector3d rotatedTarget = rotation * translatedTarget;
+    return pos + rotatedTarget;
+}
 
+void Camera::rotateYaw(double degrees) {
+    Eigen::Vector3d currentTarget = pos + viewport.forward * viewport.viewport_distance;
+    Eigen::Vector3d newTarget = rotatePointAroundCamera(currentTarget, Eigen::Vector3d(0, 1, 0), degrees);
+    lookAt(newTarget, Eigen::Vector3d(0, 1, 0));
+}
+
+void Camera::rotatePitch(double degrees) {
+    Eigen::Vector3d currentTarget = pos + viewport.forward * viewport.viewport_distance;
+    Eigen::Vector3d axis = viewport.right.normalized();
+    Eigen::Vector3d newTarget = rotatePointAroundCamera(currentTarget, axis, degrees);
+    lookAt(newTarget, Eigen::Vector3d(0, 1, 0));
+}
