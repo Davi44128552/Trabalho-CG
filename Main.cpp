@@ -292,7 +292,7 @@ int main() {
     bool addCilindro = false;
     bool addCone = false;
     bool addLuz = false;
-
+    bool GuiCamera = false;
 
     Forma* selecionado = nullptr;
 
@@ -712,6 +712,11 @@ int main() {
                 addLuz = true;
             }
 
+            if (ImGui::Button("Mudar a posição da câmera"))
+            {
+                GuiCamera = true;
+            }
+
             ImGui::End();
 
         }
@@ -880,6 +885,38 @@ int main() {
 
         }
 
+        if (GuiCamera)
+        {
+
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+
+            ImGui::Begin("Posicionar câmera");
+            ImGui::Text("Escreva a posição que você deseja colocar a câmera");
+
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+
+            if (ImGui::Button("Reposicionar câmera"))
+            {
+                camera_position[0] = x;
+                camera_position[1] = y;
+                camera_position[2] = z;
+                camera.setPosition(camera_position);
+                GuiCamera = false;
+            }
+
+            if (ImGui::Button("Onde estou?"))
+            {
+                cout << "x: " << camera_position[0] << " y: " << camera_position[1] << " z: " << camera_position[2] << endl;
+            }
+
+            ImGui::End();
+
+        }
+
         // event handler
         while (SDL_PollEvent(&event) != 0) {
 
@@ -905,6 +942,7 @@ int main() {
                 addEsfera = false;
                 addCilindro = false;
                 addCone = false;
+                GuiCamera = false;
             }
 
             else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_TAB)
