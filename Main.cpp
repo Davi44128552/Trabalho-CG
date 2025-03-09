@@ -62,6 +62,13 @@ int main() {
     Texture* texturaMadeiraWall = TextureLoader::loadTexture("textura_wall.jpg");
     Texture* texturaPiso = TextureLoader::loadTexture("textura_piso.jpg");
 
+    Material mat_default(
+        Vector3d(0.7, 0.1, 0.1),  // ka (baixa reflexão ambiente, madeira absorve luz)
+        Vector3d(0.6, 0.4, 0.2),   // kd (boa difusão da luz, textura amadeirada)
+        Vector3d(0.6, 0.4, 0.2),   // ks (brilho baixo, já que madeira não reflete muito)
+        5                      // shininess (superfície áspera, brilho baixo)
+    );
+
     Material mat_madeira(
         Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
         Vector3d(0.6, 0.4, 0.2),   // kd (boa difusão da luz, textura amadeirada)
@@ -279,6 +286,13 @@ int main() {
     bool GuiRotQ = false;
     bool GuiRotE = false;
     bool GuiCisalhamento = false;
+    bool GuiCena = false;
+    bool addObjeto = false;
+    bool addEsfera = false;
+    bool addCilindro = false;
+    bool addCone = false;
+    bool addLuz = false;
+
 
     Forma* selecionado = nullptr;
 
@@ -378,6 +392,32 @@ int main() {
                 {
                     if (selecionado != nullptr) { // Verifica se selecionado é válido
                         selecionado->setMaterial(mat_metal);
+                        cout << "Material alterado com sucesso!";
+                        GuiMaterial = false;
+                        verGui = true;
+                        selecionado = nullptr;
+                    } else {
+                        std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                    }
+                }
+
+                if (ImGui::Button("Tijolo branco"))
+                {
+                    if (selecionado != nullptr) { // Verifica se selecionado é válido
+                        selecionado->setMaterial(mat_tijolo_branco);
+                        cout << "Material alterado com sucesso!";
+                        GuiMaterial = false;
+                        verGui = true;
+                        selecionado = nullptr;
+                    } else {
+                        std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                    }
+                }
+
+                if (ImGui::Button("Madeira(Parede)"))
+                {
+                    if (selecionado != nullptr) { // Verifica se selecionado é válido
+                        selecionado->setMaterial(mat_wall_madeira);
                         cout << "Material alterado com sucesso!";
                         GuiMaterial = false;
                         verGui = true;
@@ -657,6 +697,189 @@ int main() {
             ImGui::End();
         }
 
+        if (GuiCena)
+        {
+
+            ImGui::Begin("Opções de cena");
+            ImGui::Text("O que você gostaria de fazer?");
+            if (ImGui::Button("Adicionar objeto"))
+            {
+                addObjeto = true;
+            }
+
+            if (ImGui::Button("Adicionar luz"))
+            {
+                addLuz = true;
+            }
+
+            ImGui::End();
+
+        }
+
+        if (addLuz)
+        {
+
+            static float intensidade = 0;
+
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+
+            static float cor[3] = {0.0, 0.0, 0.0};
+
+            ImGui::Begin("Adicionar luz");
+            ImGui::Text("Adicione os fatores da luz");
+
+            ImGui::InputFloat("Intensidade", &intensidade);
+
+            ImGui::Text("Posição da luz");
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+
+            ImGui::Text("Defina a cor da luz");
+            ImGui::ColorEdit3("Cor", cor);
+
+            if (ImGui::Button("Adicionar luz"))
+            {
+                scene.add_light(Luz(Eigen::Vector3d(x, y, z), Eigen::Vector3d(cor[0], cor[1], cor[2]), intensidade));
+                addLuz = false;
+            }
+
+            ImGui::End();
+
+        }
+
+        if (addObjeto)
+        {
+            ImGui::Begin("Adicionar objeto");
+            ImGui::Text("Qual objeto você gostaria de adicionar?");
+            if (ImGui::Button("Esfera"))
+            {
+                addEsfera = true;
+                addObjeto = false;
+            }
+
+            if (ImGui::Button("Cilindro"))
+            {
+                addCilindro = true;
+                addObjeto = false;
+            }
+
+            if (ImGui::Button("Cone"))
+            {
+                addCone = true;
+                addObjeto = false;
+            }
+
+            ImGui::End();
+
+        }
+
+        if (addEsfera)
+        {
+            static float raio = 0;
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+
+            ImGui::Begin("Adicionar Esfera");
+            ImGui::Text("Adicione os fatores a seguir");
+            ImGui::Text("Posição do centro da esfera");
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+            ImGui::Text("Raio da esfera");
+            ImGui::InputFloat("Raio", &raio);
+
+            if (ImGui::Button("Gerar esfera"))
+            {
+                scene.add_object(new Esfera(Eigen::Vector3d(x, y, z), raio, mat_default));
+                addEsfera = false;
+            }
+
+            ImGui::End();
+
+        }
+
+        if (addCilindro)
+        {
+            static float raioBase = 0;
+            static float altura = 0;
+
+            static float dcX = 0;
+            static float dcY = 0;
+            static float dcZ = 0;
+
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+
+            ImGui::Begin("Adicionar Cilindro");
+            ImGui::Text("Adicione os fatores a seguir");
+
+            ImGui::InputFloat("Raio da base", &raioBase);
+            ImGui::InputFloat("Altura", &altura);
+
+            ImGui::Text("Posição do centro da base");
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+
+            ImGui::Text("Direção do cilindro");
+            ImGui::InputFloat("dcX", &dcX);
+            ImGui::InputFloat("dcY", &dcY);
+            ImGui::InputFloat("dcZ", &dcZ);
+
+            if (ImGui::Button("Gerar cilindro"))
+            {
+                scene.add_object(new Cilindro(altura, raioBase, Eigen::Vector3d(dcX, dcY, dcZ), Eigen::Vector3d(x, y, z), mat_default));
+                addCilindro = false;
+            }
+
+            ImGui::End();
+
+        }
+
+        if (addCone)
+        {
+            static float raioBase = 0;
+            static float altura = 0;
+
+            static float dcX = 0;
+            static float dcY = 0;
+            static float dcZ = 0;
+
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+
+            ImGui::Begin("Adicionar Cone");
+            ImGui::Text("Adicione os fatores a seguir");
+
+            ImGui::InputFloat("Raio da base", &raioBase);
+            ImGui::InputFloat("Altura", &altura);
+
+            ImGui::Text("Posição do centro da base");
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+
+            ImGui::Text("Direção do cone");
+            ImGui::InputFloat("dcX", &dcX);
+            ImGui::InputFloat("dcY", &dcY);
+            ImGui::InputFloat("dcZ", &dcZ);
+
+            if (ImGui::Button("Gerar cone"))
+            {
+                scene.add_object(new Cone(altura, raioBase, Eigen::Vector3d(dcX, dcY, dcZ), Eigen::Vector3d(x, y, z), mat_default));
+                addCone = false;
+            }
+
+            ImGui::End();
+
+        }
+
         // event handler
         while (SDL_PollEvent(&event) != 0) {
 
@@ -676,6 +899,18 @@ int main() {
                 GuiRotE = false;
                 GuiRotQ = false;
                 GuiCisalhamento = false;
+                GuiCena = false;
+                addObjeto = false;
+                addLuz = false;
+                addEsfera = false;
+                addCilindro = false;
+                addCone = false;
+            }
+
+            else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_TAB)
+            {
+                GuiCena = true;
+
             }
 
             else if (event.type == SDL_KEYDOWN) {
@@ -729,6 +964,10 @@ int main() {
                             if (scene.remove_object(selecionado)) {
                                 camera.draw_scene(renderer, scene);
                             }
+
+                            verGui = false;
+                            GuiMaterial = false;
+                            GuiTransformacao = false;
                         }
                         break;
                     }
