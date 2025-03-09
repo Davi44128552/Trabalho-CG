@@ -787,14 +787,6 @@ int main() {
 
         // draw scene
         camera.draw_scene(renderer, scene);
-
-        // Renderizar a interface do ImGui
-        ImGui::Render();
-        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
-
-        // Atualizar a tela
-        SDL_RenderPresent(renderer);
-
         // printa o FPS no terminal
         frameCount++;
         auto currentTime = std::chrono::high_resolution_clock::now();

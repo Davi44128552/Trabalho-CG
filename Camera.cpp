@@ -4,6 +4,9 @@
 #include <mutex>
 #include <vector>
 #include <iostream>
+#include "imgui/imgui.h"
+#include "imgui/backends/imgui_impl_sdl2.h"
+#include "imgui/backends/imgui_impl_sdlrenderer2.h"
 
 Camera::Camera() : pos(Eigen::Vector3d()), bg_color(Eigen::Vector3d(1.0, 1.0, 1.0)), viewport(Viewport()) {}
 
@@ -109,6 +112,10 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
 
     updateTexture(renderer);
     SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+            // Renderizar a interface do ImGui
+    ImGui::Render();
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+
     SDL_RenderPresent(renderer);
 }
 
