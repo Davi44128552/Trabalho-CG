@@ -213,12 +213,21 @@ int main() {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.IniFilename = nullptr;
     ImGui::StyleColorsDark();
     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
     ImGui_ImplSDLRenderer2_Init(renderer);
+
+    // Criando variáveis booleanas para mostrar e desmostrar a interface de determinandas operacoes
     bool verGui = false;
     bool GuiTransformacao = false;
     bool GuiMaterial = false;
+    bool GuiTranslacao = false;
+    bool GuiEscalonamento = false;
+    bool GuiRotQ = false;
+    bool GuiRotE = false;
+    bool GuiCisalhamento = false;
+
     Forma* selecionado = nullptr;
 
     // main loop
@@ -234,6 +243,7 @@ int main() {
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
+        // Gui principal de cada objeto para realizar operacoes com este
         if (verGui){
             // Criando a interface grafica
             ImGui::Begin("Modificações do objeto"); // Inicia uma nova janela
@@ -251,6 +261,7 @@ int main() {
             ImGui::End();
         }
 
+        // Interface para alterar o material do objeto
         if (GuiMaterial)
         {
 
@@ -334,101 +345,35 @@ int main() {
 
         }
 
+        // GUI responsavel pelo gerenciamento da realizacao de transformacoes no objeto
         if (GuiTransformacao) {
             ImGui::Begin("Transformação do objeto");
             ImGui::Text("Selecione a transformação desejada");
 
+            // Usando try e catch para tratar erros de transformacoes com objetos
             try {
                 if (ImGui::Button("Translação")) {
-                    if (selecionado != nullptr) {
-                        // Verifica o tipo do objeto selecionado e faz o downcasting
-                        if (auto malha = dynamic_cast<Malha*>(selecionado)) {
-                            malha->translacao(Eigen::Vector3d(1, 1, 1));
-                        } else if (auto esfera = dynamic_cast<Esfera*>(selecionado)) {
-                            esfera->translacao(Eigen::Vector3d(1, 1, 1));
-                        } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
-                            cilindro->translacao(Eigen::Vector3d(1, 1, 1));
-                        } else if (auto cone = dynamic_cast<Cone*>(selecionado))
-                        {
-                            cone->translacao(Eigen::Vector3d(1, 1, 1));
-                        }
-                        else {
-                            std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
-                        }
-                    } else {
-                        std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
-                    }
+                    GuiTranslacao = true;
                 }
 
                 if (ImGui::Button("Escalonamento"))
                 {
-                    if (selecionado != nullptr) {
-                        // Verifica o tipo do objeto selecionado e faz o downcasting
-                        if (auto malha = dynamic_cast<Malha*>(selecionado)) {
-                            malha->escalonar(Eigen::Vector3d(1.1, 1.1, 1.1));
-                        } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
-                            cone->escalonar(1.1);
-                        } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
-                            cilindro->escalonar(1.1);
-                        } else if (auto esfera = dynamic_cast<Esfera*>(selecionado)) {
-                            esfera->escalonar(1.1);
-                        }
-                        else {
-                            std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
-                        }
-                    } else {
-                        std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
-                    }
+                    GuiEscalonamento = true;
                 }
 
                 if (ImGui::Button("Cisalhamento"))
                 {
-                    if (selecionado != nullptr) {
-                        // Verifica o tipo do objeto selecionado e faz o downcasting
-                        if (auto malha = dynamic_cast<Malha*>(selecionado)) {
-                            malha->cisalhar(1, 0, 0, 0, 0, 0);
-                        } else {
-                            std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
-                        }
-                    } else {
-                        std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
-                    }
+                    GuiCisalhamento = true;
                 }
 
                 if (ImGui::Button("Rotação em torno de um dos eixos"))
                 {
-                    if (selecionado != nullptr) {
-                        // Verifica o tipo do objeto selecionado e faz o downcasting
-                        if (auto malha = dynamic_cast<Malha*>(selecionado)) {
-                            malha->rotacionar_eixo('x', 30);
-                        } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
-                            cone->rotacionar_eixo('x', 30);
-                        } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
-                            cilindro->rotacionar_eixo('x', 30);
-                        } else {
-                            std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
-                        }
-                    } else {
-                        std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
-                    }
+                    GuiRotE = true;
                 }
 
                 if (ImGui::Button("Rotação usando quatérnios"))
                 {
-                    if (selecionado != nullptr) {
-                        // Verifica o tipo do objeto selecionado e faz o downcasting
-                        if (auto malha = dynamic_cast<Malha*>(selecionado)) {
-                            malha->rotacionar_quaternio(30, Eigen::Vector3d(1, 1, 1));
-                        } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
-                            cone->rotacionar_quaternio(30, Eigen::Vector3d(1, 1, 1));
-                        } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
-                            cilindro->rotacionar_quaternio(30, Eigen::Vector3d(1, 1, 1));
-                        } else {
-                            std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
-                        }
-                    } else {
-                        std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
-                    }
+                    GuiRotQ = true;
                 }
 
 
@@ -439,6 +384,226 @@ int main() {
             ImGui::End();
         }
 
+        // GUI para realizar a translacao do objeto
+        if (GuiTranslacao)
+        {
+
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+
+            ImGui::Begin("Translação");
+            ImGui::Text("Adicione a posição");
+
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+
+            if (ImGui::Button("Realizar translação"))
+            {
+                if (selecionado != nullptr) {
+                    // Verifica o tipo do objeto selecionado e faz o downcasting
+                    if (auto malha = dynamic_cast<Malha*>(selecionado)) {
+                        malha->translacao(Eigen::Vector3d(x, y, z));
+                    } else if (auto esfera = dynamic_cast<Esfera*>(selecionado)) {
+                        esfera->translacao(Eigen::Vector3d(x, y, z));
+                    } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
+                        cilindro->translacao(Eigen::Vector3d(x, y, z));
+                    } else if (auto cone = dynamic_cast<Cone*>(selecionado))
+                    {
+                        cone->translacao(Eigen::Vector3d(x, y, z));
+                    }
+                    else {
+                        std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
+                    }
+                } else {
+                    std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                }
+            }
+
+            ImGui::End();
+
+        }
+
+        // GUI para realizar escalonamento nos objetos
+        if (GuiEscalonamento)
+        {
+
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+            static float unico = 0;
+
+            ImGui::Begin("Escalonamento");
+            ImGui::Text("Adicione a posição");
+
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+            ImGui::InputFloat("Unico (Para objetos que não são malha)", &unico);
+
+            if (ImGui::Button("Realizar escalonamento"))
+            {
+                if (selecionado != nullptr) {
+                    // Verifica o tipo do objeto selecionado e faz o downcasting
+                    if (auto malha = dynamic_cast<Malha*>(selecionado)) {
+                        malha->escalonar(Eigen::Vector3d(x, y, z));
+                    } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
+                        cone->escalonar(unico);
+                    } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
+                        cilindro->escalonar(unico);
+                    } else if (auto esfera = dynamic_cast<Esfera*>(selecionado)) {
+                        esfera->escalonar(unico);
+                    }
+                    else {
+                        std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
+                    }
+                } else {
+                    std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                }
+            }
+
+            ImGui::End();
+
+        }
+
+        // GUI para realizar rotacao em torno de algum eixo
+        if (GuiRotE){
+
+            static float angulo = 0;
+
+            ImGui::Begin("Rotação em torno de um eixo");
+            ImGui::InputFloat("Ângulo", &angulo);
+
+            if (ImGui::Button("Em torno do eixo x"))
+            {
+                if (selecionado != nullptr) {
+                    // Verifica o tipo do objeto selecionado e faz o downcasting
+                    if (auto malha = dynamic_cast<Malha*>(selecionado)) {
+                        malha->rotacionar_eixo('x', angulo);
+                    } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
+                        cone->rotacionar_eixo('x', angulo);
+                    } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
+                        cilindro->rotacionar_eixo('x', angulo);
+                    } else {
+                        std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
+                    }
+                } else {
+                    std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                }
+            }
+
+            if (ImGui::Button("Em torno do eixo y"))
+            {
+                if (selecionado != nullptr) {
+                    // Verifica o tipo do objeto selecionado e faz o downcasting
+                    if (auto malha = dynamic_cast<Malha*>(selecionado)) {
+                        malha->rotacionar_eixo('y', angulo);
+                    } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
+                        cone->rotacionar_eixo('y', angulo);
+                    } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
+                        cilindro->rotacionar_eixo('y', angulo);
+                    } else {
+                        std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
+                    }
+                } else {
+                    std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                }
+            }
+
+            if (ImGui::Button("Em torno do eixo z"))
+            {
+                if (selecionado != nullptr) {
+                    // Verifica o tipo do objeto selecionado e faz o downcasting
+                    if (auto malha = dynamic_cast<Malha*>(selecionado)) {
+                        malha->rotacionar_eixo('z', angulo);
+                    } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
+                        cone->rotacionar_eixo('z', angulo);
+                    } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
+                        cilindro->rotacionar_eixo('z', angulo);
+                    } else {
+                        std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
+                    }
+                } else {
+                    std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                }
+            }
+
+            ImGui::End();
+
+        }
+
+        // GUI para realizar rotacao usando quaternios
+        if (GuiRotQ)
+        {
+            static float angulo = 0;
+            static float x = 0;
+            static float y = 0;
+            static float z = 0;
+
+            ImGui::Begin("Rotação com quatérnios");
+            ImGui::InputFloat("X", &x);
+            ImGui::InputFloat("Y", &y);
+            ImGui::InputFloat("Z", &z);
+            ImGui::InputFloat("Ângulo", &angulo);
+
+            if (ImGui::Button("Rotacionar"))
+            {
+                if (selecionado != nullptr) {
+                    // Verifica o tipo do objeto selecionado e faz o downcasting
+                    if (auto malha = dynamic_cast<Malha*>(selecionado)) {
+                        malha->rotacionar_quaternio(angulo, Eigen::Vector3d(x, y, z));
+                    } else if (auto cone = dynamic_cast<Cone*>(selecionado)) {
+                        cone->rotacionar_quaternio(angulo, Eigen::Vector3d(x, y, z));
+                    } else if (auto cilindro = dynamic_cast<Cilindro*>(selecionado)) {
+                        cilindro->rotacionar_quaternio(angulo, Eigen::Vector3d(x, y, z));
+                    } else {
+                        std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
+                    }
+                } else {
+                    std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                }
+            }
+
+            ImGui::End();
+
+        }
+
+        // GUI para realizar cisalhamento no objeto
+        if (GuiCisalhamento)
+        {
+            static float xy = 0;
+            static float xz = 0;
+            static float yx = 0;
+            static float yz = 0;
+            static float zx = 0;
+            static float zy = 0;
+
+            ImGui::Begin("Cisalhamento");
+
+            ImGui::InputFloat("XY", &xy);
+            ImGui::InputFloat("XZ", &xz);
+            ImGui::InputFloat("YX", &yx);
+            ImGui::InputFloat("YZ", &yz);
+            ImGui::InputFloat("ZX", &zx);
+            ImGui::InputFloat("ZY", &zy);
+
+            if (ImGui::Button("Cisalhar"))
+            {
+                if (selecionado != nullptr) {
+                    // Verifica o tipo do objeto selecionado e faz o downcasting
+                    if (auto malha = dynamic_cast<Malha*>(selecionado)) {
+                        malha->cisalhar(1, 0, 0, 0, 0, 0);
+                    } else {
+                        std::cerr << "Erro: Objeto não suporta translação!" << std::endl;
+                    }
+                } else {
+                    std::cerr << "Erro: Nenhum objeto selecionado!" << std::endl;
+                }
+            }
+
+            ImGui::End();
+        }
 
         // event handler
         while (SDL_PollEvent(&event) != 0) {
@@ -454,6 +619,11 @@ int main() {
                 verGui = false;
                 GuiMaterial = false;
                 GuiTransformacao = false;
+                GuiTranslacao = false;
+                GuiEscalonamento = false;
+                GuiRotE = false;
+                GuiRotQ = false;
+                GuiCisalhamento = false;
             }
 
             else if (event.type == SDL_KEYDOWN) {
