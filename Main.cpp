@@ -31,7 +31,7 @@ int main() {
     double viewport_width = 0.25;
     double viewport_height = viewport_width/aspect_ratio;
     double viewport_distance = 0.25;
-    int image_width = 1200;
+    int image_width = 960;
     int image_height = image_width/aspect_ratio;
 
     // SDL init
@@ -40,7 +40,7 @@ int main() {
     if (window == NULL) { printf("SDL_CreateWindow Error: %s\n", SDL_GetError()); SDL_Quit(); return 1; }
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL) { printf("SDL_CreateRenderer Error: %s\n", SDL_GetError()); SDL_DestroyWindow(window); SDL_Quit(); return 1; }
-        // Inicialize a SDL_image (para carregar PNG)
+    // para carregar PNG
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
         std::cerr << "Erro ao inicializar SDL_image: " << IMG_GetError() << std::endl;
         SDL_Quit();
@@ -233,12 +233,12 @@ int main() {
     double camera_speed = 1;
 
     Cena scene = Cena(ambient_light);
-    scene.add_object(malha);
-    scene.add_object(sphere);
+    //scene.add_object(malha);
+    //scene.add_object(sphere);
     //scene.add_object(plane);
     //scene.add_object(plane2);
-    scene.add_object(cilindro);
-    scene.add_object(cone); 
+    //scene.add_object(cilindro);
+    //scene.add_object(cone); 
     scene.add_light(light1);
     //scene.add_light(light2);
     //scene.add_object(sphere2);
@@ -256,7 +256,7 @@ int main() {
     auto startTime = std::chrono::high_resolution_clock::now();
     // main loop
     SDL_Event event;
-    camera.draw_scene(renderer, scene);
+    //camera.draw_scene(renderer, scene);
     for (Forma* obj : scene.objects) {
         obj->setSelecionada(false);
     }

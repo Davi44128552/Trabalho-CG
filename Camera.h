@@ -48,11 +48,12 @@ public:
 
 
 private:
-
     Viewport viewport;
-
-    inline void draw_pixel(SDL_Renderer* renderer, int x, int y, Eigen::Vector3d color);
+    SDL_Texture* texture;
+    std::vector<Uint32> pixelBuffer;
+    inline void draw_pixel( int x, int y, Eigen::Vector3d color,SDL_PixelFormat* format);
     Eigen::Vector3d rotatePointAroundCamera(const Eigen::Vector3d& target, const Eigen::Vector3d& axis, double degrees);
+    void updateTexture(SDL_Renderer* renderer);
 };
 
 #endif // CAMERA_H

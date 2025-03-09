@@ -10,15 +10,24 @@ Camera::Camera() : pos(Eigen::Vector3d()), bg_color(Eigen::Vector3d(1.0, 1.0, 1.
 Camera::Camera(Eigen::Vector3d pos, double width, double height, double cols, double rows, double viewport_distance, Eigen::Vector3d bg_color)
     : pos(pos), bg_color(bg_color), viewport(Viewport(Eigen::Vector3d(pos.x(), pos.y(), pos.z() - viewport_distance), width, height, cols, rows, viewport_distance)) {}
 
-// Mutex para proteger o acesso ao renderizador
-std::mutex renderMutex;
-
 void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
-    SDL_SetRenderDrawColor(renderer, bg_color.x(), bg_color.y(), bg_color.z(), 255);
-    SDL_RenderClear(renderer);
+    // Configurar textura e buffer de pixels
+    if (!texture || viewport.cols * viewport.rows != static_cast<int>(pixelBuffer.size())) {
+        if (texture) SDL_DestroyTexture(texture);
+        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, viewport.cols, viewport.rows);
+        pixelBuffer.resize(viewport.cols * viewport.rows);
+    }
+
+    // Preencher o buffer com a cor de fundo
+    Uint32 bg_pixel = SDL_MapRGBA(SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888),
+        static_cast<Uint8>(bg_color.x() * 255),
+        static_cast<Uint8>(bg_color.y() * 255),
+        static_cast<Uint8>(bg_color.z() * 255),
+        255);
+    std::fill(pixelBuffer.begin(), pixelBuffer.end(), bg_pixel);
 
     // Número de threads disponíveis
-    unsigned int num_threads = std::thread::hardware_concurrency() * 1; // Usar 3x o número de threads disponíveis
+    unsigned int num_threads = std::thread::hardware_concurrency() * 4;
     std::vector<std::thread> threads;
 
     // Número total de pixels
@@ -26,10 +35,11 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
     int pixels_per_thread = total_pixels / num_threads;
 
     // Função que cada thread executará
-    auto render_chunk = [&](int start_pixel, int end_pixel) {
-        for (int pixel = start_pixel; pixel < end_pixel; pixel++) {
-            int row = pixel / viewport.cols;
-            int col = pixel % viewport.cols;
+    auto render_chunk = [&](int start, int end) {
+        SDL_PixelFormat* format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA8888);
+        for (int i = start; i < end; ++i) {
+            int row = i / viewport.cols;
+            int col = i % viewport.cols;
 
             Eigen::Vector3d dr = ((viewport.p00 + viewport.dx * col - viewport.dy * row) - pos).normalized();
             Raio r(pos, dr);
@@ -79,12 +89,10 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
                 if(closest_shape->isSelecioanda()){
                     ieye = Eigen::Vector3d(1.0, 1.0, 0.0);
                 }
-
-                // Proteger o acesso ao renderizador com mutex
-                std::lock_guard<std::mutex> lock(renderMutex);
-                draw_pixel(renderer, col, row, ieye.cwiseMin(1.0).cwiseMax(0.0) * 255.0);
+                draw_pixel(col, row, ieye, format);
             }
         }
+        SDL_FreeFormat(format);
     };
 
     // Criar threads
@@ -99,15 +107,20 @@ void Camera::draw_scene(SDL_Renderer* renderer, Cena scene) {
         thread.join();
     }
 
+    updateTexture(renderer);
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
 }
 
 
-void Camera::draw_pixel(SDL_Renderer* renderer, int x, int y, Eigen::Vector3d color) {
-    SDL_SetRenderDrawColor(renderer, color.x(), color.y(), color.z(), 255);
-    SDL_RenderDrawPoint(renderer, x, y);
+void Camera::draw_pixel( int x, int y, Eigen::Vector3d color,SDL_PixelFormat* format) {
+    Eigen::Vector3d clamped = color.cwiseMax(0.0).cwiseMin(1.0) * 255.0;
+    Uint32 pixel = SDL_MapRGBA(format, clamped.x(), clamped.y(), clamped.z(), 255);
+    pixelBuffer[y * viewport.cols + x] = pixel;
 }
-
+void Camera::updateTexture(SDL_Renderer* renderer) {
+    SDL_UpdateTexture(texture, nullptr, pixelBuffer.data(), viewport.cols * sizeof(Uint32));
+}
 Camera::Viewport::Viewport() {
     pos = Eigen::Vector3d(0.0, 0.0, -1.0);
     width = 1.0;
