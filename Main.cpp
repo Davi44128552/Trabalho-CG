@@ -151,7 +151,7 @@ int main() {
     Vector3d normal_direita(-1.0, 0.0, 0.0);
     Vector3d p0_plano_chao(0.0, 0.0, 0.0);
     Vector3d normal_chao(0.0, 1.0, 0.0);
-    Vector3d p0_plano_teto(0.0, 2.0, 0.0);
+    Vector3d p0_plano_teto(0.0, 3.0, 0.0);
     Vector3d normal_teto(0.0, -1.0, 0.0);
 
     Plano* plano_tras = new Plano(p0_plano_tras, normal_tras, mat_wall_madeira);
@@ -160,6 +160,55 @@ int main() {
     Plano* plano_direita = new Plano(p0_plano_direita, normal_direita, mat_wall_madeira);
     Plano* plano_chao = new Plano(p0_plano_chao, normal_chao, mat_piso);
     Plano* plano_teto = new Plano(p0_plano_teto, normal_teto, mat_marmore);
+
+    //MESA 
+    std::vector<Eigen::Vector3d> vertices_mesa = {
+        // Face superior
+        Eigen::Vector3d(3.2, 1.0, 4.0),  // V0
+        Eigen::Vector3d(6.2, 1.0, 4.0),  // V1
+        Eigen::Vector3d(6.2, 1.0, 6.0),  // V2
+        Eigen::Vector3d(3.2, 1.0, 6.0),  // V3
+        
+        // Face inferior (0.3 unidades abaixo)
+        Eigen::Vector3d(3.2, 0.7, 4.0),  // V4
+        Eigen::Vector3d(6.2, 0.7, 4.0),  // V5
+        Eigen::Vector3d(6.2, 0.7, 6.0),  // V6
+        Eigen::Vector3d(3.2, 0.7, 6.0)   // V7
+    };
+    std::vector<Triangulo> faces_mesa = {
+        // Face superior
+        Triangulo(vertices_mesa[0], vertices_mesa[1], vertices_mesa[2]),
+        Triangulo(vertices_mesa[0], vertices_mesa[2], vertices_mesa[3]),
+        
+        // Face inferior
+        Triangulo(vertices_mesa[4], vertices_mesa[5], vertices_mesa[6]),
+        Triangulo(vertices_mesa[4], vertices_mesa[6], vertices_mesa[7]),
+        
+        // Laterais
+        Triangulo(vertices_mesa[0], vertices_mesa[1], vertices_mesa[5]),
+        Triangulo(vertices_mesa[0], vertices_mesa[5], vertices_mesa[4]),
+        
+        Triangulo(vertices_mesa[1], vertices_mesa[2], vertices_mesa[6]),
+        Triangulo(vertices_mesa[1], vertices_mesa[6], vertices_mesa[5]),
+        
+        Triangulo(vertices_mesa[2], vertices_mesa[3], vertices_mesa[7]),
+        Triangulo(vertices_mesa[2], vertices_mesa[7], vertices_mesa[6]),
+        
+        Triangulo(vertices_mesa[3], vertices_mesa[0], vertices_mesa[4]),
+        Triangulo(vertices_mesa[3], vertices_mesa[4], vertices_mesa[7])
+    };
+    // Criar malha com material adequado (ex: madeira escura)
+    Material mat_mesa_sinuca(
+        Vector3d(0.0, 0.2, 0.0),   // ka - Reflexão ambiente levemente esverdeada
+        Vector3d(0.0, 0.6, 0.0),   // kd - Difusa verde vibrante
+        Vector3d(0.1, 0.1, 0.1),   // ks - Reflexão especular reduzida para um efeito mais fosco
+        20                         // shininess - Reduzido para simular o feltro
+    );
+    
+
+    Malha* mesa = new Malha(faces_mesa, vertices_mesa, mat_mesa_sinuca);
+
+
 
     Material formas = Material(
         Vector3d(0.7, 0.2, 0.2),
@@ -228,7 +277,7 @@ int main() {
 
 
     Luz light1 = Luz(
-        Vector3d(5,1,5),
+        Vector3d(5,2.98,5),
         Vector3d(1.0, 1.0, 1.0),
         0.2
     );
@@ -263,7 +312,58 @@ int main() {
     scene.add_object(plano_direita);
     scene.add_object(plano_chao);
     scene.add_object(plano_teto);
-
+    // Adicionar à cena
+    scene.add_object(mesa);
+    Material mat_pes(
+        Vector3d(0.1, 0.05, 0.02),  // ka - Reflexão ambiente com tom amadeirado
+        Vector3d(0.5, 0.25, 0.1),   // kd - Difusa marrom quente
+        Vector3d(0.2, 0.15, 0.1),   // ks - Reflexão especular reduzida para um brilho mais natural
+        50                          // shininess - Ajustado para um brilho suave
+    );
+    
+    // Lista de posições para os 4 pés (coordenadas dos cantos inferiores da mesa)
+    vector<Vector3d> posicoes_pes = {
+        Vector3d(3.2, 0.0, 4.0),   // Pé frontal esquerdo
+        Vector3d(6.2 - 0.5, 0.0, 4.0),  // Pé frontal direito
+        Vector3d(6.2 - 0.5, 0.0, 6.0 - 0.5),  // Pé traseiro direito
+        Vector3d(3.2, 0.0, 6.0 - 0.5)   // Pé traseiro esquerdo
+    };
+    
+    // Criar e configurar cada pé
+    for(Vector3d pos : posicoes_pes) {
+        // Criar cubo unitário
+        vector<Vector3d> vertices_pe = {
+            Vector3d(0,0,0), Vector3d(0.5,0,0),
+            Vector3d(0.5,0,0.5), Vector3d(0,0,0.5),
+            Vector3d(0,0.7,0), Vector3d(0.5,0.7,0),
+            Vector3d(0.5,0.7,0.5), Vector3d(0,0.7,0.5)
+        };
+    
+        vector<Triangulo> faces_pe = {
+            // Face inferior
+            Triangulo(vertices_pe[0], vertices_pe[1], vertices_pe[2]),
+            Triangulo(vertices_pe[0], vertices_pe[2], vertices_pe[3]),
+            // Face superior
+            Triangulo(vertices_pe[4], vertices_pe[5], vertices_pe[6]),
+            Triangulo(vertices_pe[4], vertices_pe[6], vertices_pe[7]),
+            // Laterais
+            Triangulo(vertices_pe[0], vertices_pe[1], vertices_pe[5]),
+            Triangulo(vertices_pe[0], vertices_pe[5], vertices_pe[4]),
+            Triangulo(vertices_pe[1], vertices_pe[2], vertices_pe[6]),
+            Triangulo(vertices_pe[1], vertices_pe[6], vertices_pe[5]),
+            Triangulo(vertices_pe[2], vertices_pe[3], vertices_pe[7]),
+            Triangulo(vertices_pe[2], vertices_pe[7], vertices_pe[6]),
+            Triangulo(vertices_pe[3], vertices_pe[0], vertices_pe[4]),
+            Triangulo(vertices_pe[3], vertices_pe[4], vertices_pe[7])
+        };
+    
+        Malha* pe = new Malha(faces_pe, vertices_pe, mat_pes);
+        
+        // Aplicar transformações
+        pe->translacao(pos);  // Posicionar no canto correto
+        
+        scene.add_object(pe);
+    }
     // contador de fps
     int frameCount = 0;
     auto startTime = std::chrono::high_resolution_clock::now();
