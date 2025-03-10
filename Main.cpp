@@ -61,6 +61,11 @@ int main() {
     Texture* texturaTijoloBranco = TextureLoader::loadTexture("textura_tijolo_branco.jpg");
     Texture* texturaMadeiraWall = TextureLoader::loadTexture("textura_wall.jpg");
     Texture* texturaPiso = TextureLoader::loadTexture("textura_piso.jpg");
+    Texture* texturaBola1 = TextureLoader::loadTexture("Ball1.jpg");
+    Texture* texturaBola2 = TextureLoader::loadTexture("Ball2.jpg");
+    Texture* texturaBola3 = TextureLoader::loadTexture("Ball3.jpg");
+    Texture* texturaBola4 = TextureLoader::loadTexture("Ball4.jpg");
+    Texture* texturaBola5 = TextureLoader::loadTexture("Ball5.jpg");
 
     Material mat_default(
         Vector3d(0.7, 0.1, 0.1),  // ka (baixa reflexão ambiente, madeira absorve luz)
@@ -131,6 +136,42 @@ int main() {
         10,                        // shininess (superfície áspera, brilho baixo)
         texturaPiso
     );
+
+    Material mat_bola1(
+        Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
+        Vector3d(1,1,1),   // kd (boa difusão da luz, textura amadeirada)
+        Vector3d(0.3, 0.2, 0.1),   // ks (brilho baixo, já que madeira não reflete muito)
+        50,                        // shininess (superfície áspera, brilho baixo)
+        texturaBola1
+    );
+    Material mat_bola2(
+        Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
+        Vector3d(1,1,1),   // kd (boa difusão da luz, textura amadeirada)
+        Vector3d(0.3, 0.2, 0.1),   // ks (brilho baixo, já que madeira não reflete muito)
+        50,                        // shininess (superfície áspera, brilho baixo)
+        texturaBola2
+    );
+    Material mat_bola3(
+        Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
+        Vector3d(1,1,1),   // kd (boa difusão da luz, textura amadeirada)
+        Vector3d(0.3, 0.2, 0.1),   // ks (brilho baixo, já que madeira não reflete muito)
+        50,                        // shininess (superfície áspera, brilho baixo)
+        texturaBola3
+    );
+    Material mat_bola4(
+        Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
+        Vector3d(1,1,1),   // kd (boa difusão da luz, textura amadeirada)
+        Vector3d(0.3, 0.2, 0.1),   // ks (brilho baixo, já que madeira não reflete muito)
+        50,                        // shininess (superfície áspera, brilho baixo)
+        texturaBola4
+    );
+    Material mat_bola5(
+        Vector3d(0.2, 0.1, 0.05),  // ka (baixa reflexão ambiente, madeira absorve luz)
+        Vector3d(1,1,1),   // kd (boa difusão da luz, textura amadeirada)
+        Vector3d(0.3, 0.2, 0.1),   // ks (brilho baixo, já que madeira não reflete muito)
+        50,                        // shininess (superfície áspera, brilho baixo)
+        texturaBola5
+    );
     double sphere_radius = 0.5;
     Vector3d sphere_center(0,-0.5,0);
 
@@ -160,6 +201,13 @@ int main() {
     Plano* plano_direita = new Plano(p0_plano_direita, normal_direita, mat_wall_madeira);
     Plano* plano_chao = new Plano(p0_plano_chao, normal_chao, mat_piso);
     Plano* plano_teto = new Plano(p0_plano_teto, normal_teto, mat_marmore);
+
+    // Instanciando 5 esferas com raio 0.05
+    Esfera* sphere5 = new Esfera(Vector3d(4.0, 1.05, 5.0), 0.05, mat_bola1);
+    Esfera* sphere6 = new Esfera(Vector3d(6.0, 1.05, 5.05), 0.05, mat_bola2);
+    Esfera* sphere7 = new Esfera(Vector3d(5.0, 1.05, 5.5), 0.05, mat_bola3);
+    Esfera* sphere8 = new Esfera(Vector3d(5.5, 1.05, 4.5), 0.05, mat_bola4);
+    Esfera* sphere9 = new Esfera(Vector3d(4.0, 1.05, 5.0), 0.05, mat_bola5);
 
     //MESA 
     std::vector<Eigen::Vector3d> vertices_mesa = {
@@ -201,8 +249,8 @@ int main() {
     Material mat_mesa_sinuca(
         Vector3d(0.0, 0.2, 0.0),   // ka - Reflexão ambiente levemente esverdeada
         Vector3d(0.0, 0.6, 0.0),   // kd - Difusa verde vibrante
-        Vector3d(0.1, 0.1, 0.1),   // ks - Reflexão especular reduzida para um efeito mais fosco
-        20                         // shininess - Reduzido para simular o feltro
+        Vector3d(0.5, 0.5, 0.5),   // ks - Reflexão especular reduzida para um efeito mais fosco
+        60                         // shininess - Reduzido para simular o feltro
     );
     
 
@@ -263,6 +311,171 @@ int main() {
     Esfera* sphere3 = new Esfera(Vector3d(0.0, 0.0, 0.0), 0.5, mat_plastico);
     Esfera* sphere4 = new Esfera(Vector3d(-1.5, 0.0, 0.0), 0.5, mat_madeira);
 
+    // Definir o material da lateral
+Material mat_lateral(
+    Vector3d(0.2, 0.1, 0.05),  // ka (reflexão ambiente)
+    Vector3d(0.6, 0.4, 0.2),   // kd (difusão)
+    Vector3d(0.3, 0.2, 0.1),   // ks (reflexão especular)
+    10                         // shininess
+);
+
+// Coordenadas da mesa
+double mesa_x_min = 3.2;
+double mesa_x_max = 6.2;
+double mesa_z_min = 4.0;
+double mesa_z_max = 6.0;
+double mesa_y = 1.0; // Altura da mesa
+
+// Altura da lateral
+double altura_lateral = 0.05;
+
+// Vértices da lateral
+std::vector<Eigen::Vector3d> vertices_lateral = {
+    // Frente
+    Eigen::Vector3d(mesa_x_min, mesa_y, mesa_z_min),                // V0
+    Eigen::Vector3d(mesa_x_max, mesa_y, mesa_z_min),                // V1
+    Eigen::Vector3d(mesa_x_min, mesa_y + altura_lateral, mesa_z_min), // V2
+    Eigen::Vector3d(mesa_x_max, mesa_y + altura_lateral, mesa_z_min), // V3
+
+    // Trás
+    Eigen::Vector3d(mesa_x_min, mesa_y, mesa_z_max),                // V4
+    Eigen::Vector3d(mesa_x_max, mesa_y, mesa_z_max),                // V5
+    Eigen::Vector3d(mesa_x_min, mesa_y + altura_lateral, mesa_z_max), // V6
+    Eigen::Vector3d(mesa_x_max, mesa_y + altura_lateral, mesa_z_max), // V7
+
+    // Esquerda
+    Eigen::Vector3d(mesa_x_min, mesa_y, mesa_z_min),                // V8 (V0)
+    Eigen::Vector3d(mesa_x_min, mesa_y, mesa_z_max),                // V9 (V4)
+    Eigen::Vector3d(mesa_x_min, mesa_y + altura_lateral, mesa_z_min), // V10 (V2)
+    Eigen::Vector3d(mesa_x_min, mesa_y + altura_lateral, mesa_z_max), // V11 (V6)
+
+    // Direita
+    Eigen::Vector3d(mesa_x_max, mesa_y, mesa_z_min),                // V12 (V1)
+    Eigen::Vector3d(mesa_x_max, mesa_y, mesa_z_max),                // V13 (V5)
+    Eigen::Vector3d(mesa_x_max, mesa_y + altura_lateral, mesa_z_min), // V14 (V3)
+    Eigen::Vector3d(mesa_x_max, mesa_y + altura_lateral, mesa_z_max)  // V15 (V7)
+};
+
+// Triângulos da lateral (cada retângulo é dividido em 2 triângulos)
+std::vector<Triangulo> faces_lateral = {
+    // Frente
+    Triangulo(vertices_lateral[0], vertices_lateral[1], vertices_lateral[2]),
+    Triangulo(vertices_lateral[1], vertices_lateral[3], vertices_lateral[2]),
+
+    // Trás
+    Triangulo(vertices_lateral[4], vertices_lateral[5], vertices_lateral[6]),
+    Triangulo(vertices_lateral[5], vertices_lateral[7], vertices_lateral[6]),
+
+    // Esquerda
+    Triangulo(vertices_lateral[8], vertices_lateral[9], vertices_lateral[10]),
+    Triangulo(vertices_lateral[9], vertices_lateral[11], vertices_lateral[10]),
+
+    // Direita
+    Triangulo(vertices_lateral[12], vertices_lateral[13], vertices_lateral[14]),
+    Triangulo(vertices_lateral[13], vertices_lateral[15], vertices_lateral[14])
+};
+
+    // Criar a malha da lateral
+    Malha* lateral_mesa = new Malha(faces_lateral, vertices_lateral, mat_lateral);
+    // Distância entre as laterais
+    double distancia_laterais = 0.01;
+    double altura_lateral2 = 0.3;
+
+    // Vértices da segunda lateral (deslocada 0.05 unidades para fora)
+    std::vector<Eigen::Vector3d> vertices_lateral2 = {
+        // Frente
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y, mesa_z_min - distancia_laterais),                // V0
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y, mesa_z_min - distancia_laterais),                // V1
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y + altura_lateral2, mesa_z_min - distancia_laterais), // V2
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y + altura_lateral2, mesa_z_min - distancia_laterais), // V3
+
+        // Trás
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y, mesa_z_max + distancia_laterais),                // V4
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y, mesa_z_max + distancia_laterais),                // V5
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y + altura_lateral2, mesa_z_max + distancia_laterais), // V6
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y + altura_lateral2, mesa_z_max + distancia_laterais), // V7
+
+        // Esquerda
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y, mesa_z_min - distancia_laterais),                // V8 (V0)
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y, mesa_z_max + distancia_laterais),                // V9 (V4)
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y + altura_lateral2, mesa_z_min - distancia_laterais), // V10 (V2)
+        Eigen::Vector3d(mesa_x_min - distancia_laterais, mesa_y + altura_lateral2, mesa_z_max + distancia_laterais), // V11 (V6)
+
+        // Direita
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y, mesa_z_min - distancia_laterais),                // V12 (V1)
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y, mesa_z_max + distancia_laterais),                // V13 (V5)
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y + altura_lateral2, mesa_z_min - distancia_laterais), // V14 (V3)
+        Eigen::Vector3d(mesa_x_max + distancia_laterais, mesa_y + altura_lateral2, mesa_z_max + distancia_laterais)  // V15 (V7)
+    };
+    Material mat_lateral2(
+        Vector3d(0.1, 0.05, 0.02),  // ka (reflexão ambiente)
+        Vector3d(0.4, 0.2, 0.1),    // kd (difusão)
+        Vector3d(0.2, 0.1, 0.05),   // ks (reflexão especular)
+        10                          // shininess
+    );
+    
+    // Triângulos da segunda lateral (cada retângulo é dividido em 2 triângulos)
+    std::vector<Triangulo> faces_lateral2 = {
+        // Frente
+        Triangulo(vertices_lateral2[0], vertices_lateral2[1], vertices_lateral2[2]),
+        Triangulo(vertices_lateral2[1], vertices_lateral2[3], vertices_lateral2[2]),
+
+        // Trás
+        Triangulo(vertices_lateral2[4], vertices_lateral2[5], vertices_lateral2[6]),
+        Triangulo(vertices_lateral2[5], vertices_lateral2[7], vertices_lateral2[6]),
+
+        // Esquerda
+        Triangulo(vertices_lateral2[8], vertices_lateral2[9], vertices_lateral2[10]),
+        Triangulo(vertices_lateral2[9], vertices_lateral2[11], vertices_lateral2[10]),
+
+        // Direita
+        Triangulo(vertices_lateral2[12], vertices_lateral2[13], vertices_lateral2[14]),
+        Triangulo(vertices_lateral2[13], vertices_lateral2[15], vertices_lateral2[14])
+    };
+
+    // Criar a malha da segunda lateral
+    Malha* lateral_mesa2 = new Malha(faces_lateral2, vertices_lateral2, mat_lateral);
+    lateral_mesa2->translacao(Eigen::Vector3d(0, -0.3, 0));
+    // Definir o material amarelo para o lustre
+    Material mat_lustre(
+        Vector3d(0.2, 0.2, 0.0),  // ka (reflexão ambiente)
+        Vector3d(1.0, 1.0, 0.0),   // kd (difusão - cor amarela)
+        Vector3d(0.5, 0.5, 0.0),   // ks (reflexão especular)
+        50                         // shininess
+    );
+    
+    // Parâmetros do cone (lustre)
+    double raio_base_lustre = 0.5;
+    double altura_lustre = 0.3;
+    
+    // Posição do cone (centro da base do cone)
+    Vector3d posicao_lustre(4.7, 3.0 - altura_lustre, 5.0); // Centralizado acima da mesa
+    
+    // Direção do cone (apontando para baixo)
+    Vector3d direcao_lustre(0.0, 1.0, 0.0);
+    
+    // Criar o cone (lustre)
+    Cone* lustre = new Cone(altura_lustre, raio_base_lustre, direcao_lustre, posicao_lustre, mat_lustre);
+    Material mat_taco(
+        Vector3d(0.2, 0.1, 0.05),  // ka (reflexão ambiente)
+        Vector3d(0.4, 0.2, 0.1),    // kd (difusão - cor marrom)
+        Vector3d(0.3, 0.2, 0.1),    // ks (reflexão especular)
+        20                          // shininess
+    );
+    
+    // Parâmetros do taco
+    double altura_taco = 2.0;       // Comprimento do taco
+    double raio_taco = 0.02;        // Raio do taco
+    double centro_y_taco = 1.07;     // Posição no eixo y
+    
+    // Posição do taco (centro do cilindro)
+    Vector3d posicao_taco(4.7, centro_y_taco, 5.0); // Centralizado na mesa
+    
+    // Direção do taco (horizontal, ao longo do eixo x)
+    Vector3d direcao_taco(-1.0, 0.0, 1.0);
+    
+    // Criar o cilindro (taco)
+    Cilindro* taco = new Cilindro(altura_taco, raio_taco, direcao_taco, posicao_taco, mat_madeira);
     Plano* plane = new Plano(plane_p0, plane_normal, mat_tijolo);
     Plano* plane2 = new Plano(plane2_p0, plane2_normal, mat_marmore);
     
@@ -277,7 +490,7 @@ int main() {
 
 
     Luz light1 = Luz(
-        Vector3d(5,2.98,5),
+        Vector3d(4.7,2.63,5),
         Vector3d(1.0, 1.0, 1.0),
         0.2
     );
@@ -295,17 +508,8 @@ int main() {
     double camera_speed = 1;
 
     Cena scene = Cena(ambient_light);
-    //scene.add_object(malha);
-    //scene.add_object(sphere);
-    //scene.add_object(plane);
-    //scene.add_object(plane2);
-    //scene.add_object(cilindro);
-    //scene.add_object(cone); 
+
     scene.add_light(light1);
-    //scene.add_light(light2);
-    //scene.add_object(sphere2);
-    //scene.add_object(sphere3);
-    //scene.add_object(sphere4);
     scene.add_object(plano_tras);
     scene.add_object(plano_frente);
     scene.add_object(plano_esquerda);
@@ -320,7 +524,15 @@ int main() {
         Vector3d(0.2, 0.15, 0.1),   // ks - Reflexão especular reduzida para um brilho mais natural
         50                          // shininess - Ajustado para um brilho suave
     );
-    
+    scene.add_object(sphere5);
+    scene.add_object(sphere6);
+    scene.add_object(sphere7);
+    scene.add_object(sphere8);
+    scene.add_object(sphere9);
+    scene.add_object(lateral_mesa);
+    scene.add_object(lateral_mesa2);
+    scene.add_object(lustre);
+    scene.add_object(taco);
     // Lista de posições para os 4 pés (coordenadas dos cantos inferiores da mesa)
     vector<Vector3d> posicoes_pes = {
         Vector3d(3.2, 0.0, 4.0),   // Pé frontal esquerdo
