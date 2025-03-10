@@ -23,9 +23,22 @@ Intersecao Malha::obter_intersecao(const Raio& raio) const {
             encontrou_intersecao = true;
         }
     }
+
+    Eigen::Vector3d Malha::calcular_normal_media() const {
+    Eigen::Vector3d normal_media = Eigen::Vector3d::Zero();
+
+    // Soma as normais de todas as faces
+    for (const Triangulo& face : faces) {
+        normal_media += face.obter_normal();
+    }
+
+    // Normaliza o resultado
+    normal_media.normalize();
+    return normal_media;
+}
     
     ponto_intersecao = raio.Po + menor_ti * raio.dr;
-    return Intersecao(encontrou_intersecao, menor_ti, normal, ponto_intersecao);
+    return Intersecao(encontrou_intersecao, menor_ti, normal_media, ponto_intersecao);
 }
 
 // Implementando a função de translacao
