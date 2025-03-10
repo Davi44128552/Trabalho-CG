@@ -15,7 +15,7 @@ Intersecao Cone::obter_intersecao(const Raio& raio) const {
     // Coeficientes da equação quadrática para o cone
     double cos_theta = altura / std::sqrt(altura * altura + raio_base * raio_base);
     double cos2_theta = cos_theta * cos_theta;
-    double a = raio.dr.dot(dc) * raio.dr.dot(dc) - cos2_theta;
+    double a = raio.dr.dot(dc) * raio.dr.dot(dc) - raio.dr.dot(raio.dr) * cos2_theta;
     double b = 2.0 * (raio.dr.dot(dc) * co.dot(dc) - raio.dr.dot(co) * cos2_theta);
     double c = co.dot(dc) * co.dot(dc) - co.dot(co) * cos2_theta;
 
